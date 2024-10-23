@@ -1,0 +1,9 @@
+Export raw data : Export raw data,True
+Data : Criteria 1,True
+Data : Criteria 2,True
+Data : Data capture,Default
+Data : Interval 1,"100.00000",ms
+Data : Interval 2,"5.00000",N
+Data : Measurement 1,Time
+Data : Measurement 2,Load
+

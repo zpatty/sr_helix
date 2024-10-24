@@ -1,7 +1,7 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2023a">
-  <configuration build-checksum="1401524046" file="/home/zach/git-repos/matlab/DRL/helix/helix_controller.prj" location="/home/zach/git-repos/matlab/DRL/helix" name="helix_controller" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="3532996822" file="/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.prj" location="/home/zach/git-repos/sr_helix/helix_control_codegen" name="helix_controller" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
-      <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
+      <param.BuiltInstrumentedMex />
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
       <param.WorkingFolder>option.WorkingFolder.Project</param.WorkingFolder>
       <param.SpecifiedWorkingFolder />
@@ -11,15 +11,15 @@
       <var.SimdQueryHardwareVendor>Generic</var.SimdQueryHardwareVendor>
       <var.SimdQueryHardwareType>MATLAB Host Computer</var.SimdQueryHardwareType>
       <param.InstructionSetExtensionsAvailableInUI>true</param.InstructionSetExtensionsAvailableInUI>
-      <param.ResponsivenessChecks>true</param.ResponsivenessChecks>
-      <param.ExtrinsicCalls>true</param.ExtrinsicCalls>
-      <param.IntegrityChecks>true</param.IntegrityChecks>
+      <param.ResponsivenessChecks />
+      <param.ExtrinsicCalls />
+      <param.IntegrityChecks />
       <param.SaturateOnIntegerOverflow>true</param.SaturateOnIntegerOverflow>
       <param.EnableAutoParallelization>false</param.EnableAutoParallelization>
       <param.NumberOfCpuThreads>0</param.NumberOfCpuThreads>
       <param.OptimizeReductions>false</param.OptimizeReductions>
-      <param.SIMDAcceleration>option.SIMDAcceleration.Portable</param.SIMDAcceleration>
-      <param.GlobalDataSyncMethod>option.GlobalDataSyncMethod.SyncAlways</param.GlobalDataSyncMethod>
+      <param.SIMDAcceleration />
+      <param.GlobalDataSyncMethod />
       <param.EnableVariableSizing>true</param.EnableVariableSizing>
       <param.EnableDynamicMemoryAllocation>true</param.EnableDynamicMemoryAllocation>
       <param.DynamicMemoryAllocation>option.DynamicMemoryAllocation.Threshold</param.DynamicMemoryAllocation>
@@ -38,7 +38,7 @@
       <param.CodeFormattingTool>option.CodeFormattingTool.Auto</param.CodeFormattingTool>
       <param.ReservedNameArray />
       <param.CppStyleConst>true</param.CppStyleConst>
-      <param.EnableDebugging>false</param.EnableDebugging>
+      <param.EnableDebugging />
       <param.Verbosity>option.Verbosity.Info</param.Verbosity>
       <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.GenerateReport>true</param.GenerateReport>
@@ -65,7 +65,7 @@
       <param.CompileTimeRecursionLimit>50</param.CompileTimeRecursionLimit>
       <param.EnableRuntimeRecursion>true</param.EnableRuntimeRecursion>
       <param.PreserveVariableNames>option.PreserveVariableNames.None</param.PreserveVariableNames>
-      <param.EchoExpressions>true</param.EchoExpressions>
+      <param.EchoExpressions />
       <param.InlineThreshold>10</param.InlineThreshold>
       <param.InlineThresholdMax>200</param.InlineThresholdMax>
       <param.InlineStackLimit>1000000</param.InlineStackLimit>
@@ -77,13 +77,13 @@
       <param.EnableOpenMP>true</param.EnableOpenMP>
       <param.InitFltsAndDblsToZero>true</param.InitFltsAndDblsToZero>
       <param.DefaultVariableInitialization>option.DefaultVariableInitialization.None</param.DefaultVariableInitialization>
-      <param.ConstantInputs>option.ConstantInputs.CheckValues</param.ConstantInputs>
-      <param.EnableCRICodeCoverage>true</param.EnableCRICodeCoverage>
+      <param.ConstantInputs />
+      <param.EnableCRICodeCoverage />
       <param.EnableAutoParallelizationReporting>true</param.EnableAutoParallelizationReporting>
       <param.CacheDynamicArrayDataPointer>true</param.CacheDynamicArrayDataPointer>
       <param.EnableJIT>false</param.EnableJIT>
-      <param.EnableJITSilentBailOut>false</param.EnableJITSilentBailOut>
-      <param.CheckForIssuesJIT>true</param.CheckForIssuesJIT>
+      <param.EnableJITSilentBailOut />
+      <param.CheckForIssuesJIT />
       <param.EnableGitSupport>false</param.EnableGitSupport>
       <param.EnableAutoCommit>true</param.EnableAutoCommit>
       <param.RepositoryStyle>option.RepositoryStyle.Auto</param.RepositoryStyle>
@@ -343,7 +343,7 @@
       <param.IndentStyle>option.IndentStyle.K&amp;R</param.IndentStyle>
       <param.IndentSize>2</param.IndentSize>
       <param.ColumnLimit>80</param.ColumnLimit>
-      <param.grt.GenCodeOnly>true</param.grt.GenCodeOnly>
+      <param.grt.GenCodeOnly>false</param.grt.GenCodeOnly>
       <param.ConstantFoldingTimeout>40000</param.ConstantFoldingTimeout>
       <param.CompileTimeRecursionLimit>50</param.CompileTimeRecursionLimit>
       <param.EnableRuntimeRecursion>true</param.EnableRuntimeRecursion>
@@ -542,6 +542,7 @@
         <param.IndentStyle />
         <param.IndentSize />
         <param.ColumnLimit />
+        <param.grt.GenCodeOnly />
         <param.ConstantFoldingTimeout />
         <param.CompileTimeRecursionLimit />
         <param.EnableRuntimeRecursion />
@@ -598,7 +599,7 @@
     </param.TestSnippets>
     <param.ExternalFcnMajority>column</param.ExternalFcnMajority>
     <param.UseGlobals>option.UseGlobals.No</param.UseGlobals>
-    <param.outputfile>${PROJECT_ROOT}/codegen/lib/helix_controller/helix_controller.a</param.outputfile>
+    <param.outputfile>${PROJECT_ROOT}/codegen/dll/helix_controller/helix_controller.so</param.outputfile>
     <param.version>R2012a</param.version>
     <param.HasECoderFeatures>true</param.HasECoderFeatures>
     <param.HasGpuCoder>true</param.HasGpuCoder>
@@ -621,15 +622,15 @@
     <var.DismissScreener>false</var.DismissScreener>
     <param.unifiedParamStorage />
     <param.hdlParamStorage />
-    <var.gc.lastOutputRoot>codegen/lib/helix_controller</var.gc.lastOutputRoot>
-    <var.gc.lastOutputType>C_CODE</var.gc.lastOutputType>
-    <var.gc.preBuildChecksum>3521085613</var.gc.preBuildChecksum>
+    <var.gc.lastOutputRoot>codegen/dll/helix_controller</var.gc.lastOutputRoot>
+    <var.gc.lastOutputType>SHARED_LIBRARY</var.gc.lastOutputType>
+    <var.gc.preBuildChecksum>1613564431</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen/mex/helix_controller</var.cfi.lastOutputRoot>
     <var.cfi.preBuildChecksum>2784270501</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>[tau, tau_r, x, M, C, A, cq] = helix_controller(q0,dq0,q0,q0,q0,d,m,r,N,kb,ks,bb,bs,L0,Kp,KD,Kpx, KDx, xd, dxd, dx, conv_pcc,conv_motor);</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/spatial_cross.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;4212067171&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/matlab/DRL/helix/spatial_cross.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/spatial_cross.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;4212067171&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/spatial_cross.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.NoDefaultJIT>false</param.NoDefaultJIT>
     <param.configImportActive>false</param.configImportActive>
@@ -645,8 +646,8 @@
     <param.NumCompileJobs>1</param.NumCompileJobs>
     <param.mex.outputfile>helix_controller_mex</param.mex.outputfile>
     <param.grt.outputfile>helix_controller</param.grt.outputfile>
-    <param.artifact>option.target.artifact.lib</param.artifact>
-    <param.outputfile>${PROJECT_ROOT}/codegen/lib/helix_controller/helix_controller.a</param.outputfile>
+    <param.artifact>option.target.artifact.dll</param.artifact>
+    <param.outputfile>${PROJECT_ROOT}/codegen/dll/helix_controller/helix_controller.so</param.outputfile>
     <param.CppNamespace />
     <param.CppPackagesToNamespaces>true</param.CppPackagesToNamespaces>
     <param.CppNamespaceForMathworksCode>coder</param.CppNamespaceForMathworksCode>
@@ -952,7 +953,7 @@
       </file>
     </fileset.inputtypes>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/codegen/lib/helix_controller" name="helix_controller.a" optional="false">/home/zach/git-repos/matlab/DRL/helix/codegen/lib/helix_controller/helix_controller.a</file>
+      <file location="${PROJECT_ROOT}/codegen/dll/helix_controller" name="helix_controller.so" optional="false">/home/zach/git-repos/sr_helix/helix_control_codegen/codegen/dll/helix_controller/helix_controller.so</file>
     </build-deliverables>
     <workflow />
     <matlab>

@@ -1,0 +1,9 @@
+DLL {
+	global:
+		helix_controller;
+		helix_controller_initialize;
+		helix_controller_terminate;
+		rt_powd_snf;
+	local:
+		*;
+};

@@ -423,123 +423,44 @@ fkbt = 0.001./[6.55, 0.79, 0.19]/(pi/180);
 fkbD = 0.001./[1.0, 0.79, 0.78]/(pi/180);
 fkbH = 0.001./[0.53, 0.79, 1.05]/(pi/180);
 
-
-savef = 1;
 % Compression
-figure
-yyaxis left
-plot(Nhv,knh, "LineWidth",2.0)
+scatter(Nhv,knh)
 hold on
-scatter(Nhv,fkNh, "LineWidth",2.0)
-ylabel("Axial Stiffness (N/m)", 'Interpreter', 'latex', 'FontSize', 28)
+scatter(Nhv,fkNh)
 
-yyaxis right
-plot(Nhv,kbNh, "LineWidth",2.0)
-hold on
-scatter(Nhv,fkbNh, "LineWidth",2.0)
-ylabel("Bending Stiffness (Nm/rad)", 'Interpreter', 'latex', 'FontSize', 28)
-
-legend(["Analytical", "FEM"])
-xlabel("$N_h$", 'Interpreter', 'latex', 'FontSize', 28)
-set(gca,'FontSize',28)
-ax = gca;
-set(ax, 'TickLabelInterpreter', 'latex')
-set(gcf, 'Position', [303 495 1120 630])
-% Modify the figure size
-% set(gcf, 'Position', [303 495 1120 630])
-% Get the legend and set its interpreter
-l = findobj(gcf, 'Type', 'legend');
-set(l, 'Interpreter', 'latex')
-% Turn on grid and box
-grid on
-box on 
-fig = gcf;
-if savef == 1
-    print(fig, "Nh", '-dpdf')
-end
-
-%%%% w %%%%
 figure
-yyaxis left
 plot(wve,kw,'LineWidth',2)
 hold on
-scatter([4, 8, 12],fkw, "LineWidth",2.0)
-ylabel("Axial Stiffness (N/m)", 'Interpreter', 'latex', 'FontSize', 28)
-
-yyaxis right
-plot(wve,kbw,'LineWidth',2)
-hold on
-scatter([4, 8, 12],fkbw, "LineWidth",2.0)
-ylabel("Bending Stiffness (Nm/rad)", 'Interpreter', 'latex', 'FontSize', 28)
-
-legend(["Analytical", "FEM"])
-xlabel("$w$ (m)", 'Interpreter', 'latex', 'FontSize', 28)
-set(gca,'FontSize',28)
-ax = gca;
-set(ax, 'TickLabelInterpreter', 'latex')
-set(gcf, 'Position', [303 495 1120 630])
-% Modify the figure size
-% set(gcf, 'Position', [303 495 1120 630])
-% Get the legend and set its interpreter
-l = findobj(gcf, 'Type', 'legend');
-set(l, 'Interpreter', 'latex')
-% Turn on grid and box
-grid on
-box on 
-fig = gcf;
-if savef == 1
-    print(fig, "w", '-dpdf')
-end
+scatter([4, 8, 12],fkw)
 
 %%%% t %%%%
 figure
 yyaxis left
 plot(tv,kt,'LineWidth',2)
 hold on
-scatter([2, 4, 6],fkt, "LineWidth",2.0)
-ylabel("Axial Stiffness (N/m)", 'Interpreter', 'latex', 'FontSize', 28)
+scatter([2, 4, 6],fkt)
 
-yyaxis right
+yyais right
 plot(tv,kbt,'LineWidth',2)
 hold on
-scatter([2, 4, 6],fkbt, "LineWidth",2.0)
-ylabel("Bending Stiffness (Nm/rad)", 'Interpreter', 'latex', 'FontSize', 28)
-
-legend(["Analytical", "FEM"])
-xlabel("$t$ (m)", 'Interpreter', 'latex', 'FontSize', 28)
-set(gca,'FontSize',28)
-ax = gca;
-set(ax, 'TickLabelInterpreter', 'latex')
-set(gcf, 'Position', [303 495 1120 630])
-% Modify the figure size
-% set(gcf, 'Position', [303 495 1120 630])
-% Get the legend and set its interpreter
-l = findobj(gcf, 'Type', 'legend');
-set(l, 'Interpreter', 'latex')
-% Turn on grid and box
-grid on
-box on 
-fig = gcf;
-if savef == 1
-    print(fig, "t", '-dpdf')
-end
+scatter([2, 4, 6],fkbt)
 
 %%%% D %%%%
 figure
 yyaxis left
 plot(Dv,kD,'LineWidth',2)
 hold on
-scatter([40,60,80],fkD, "LineWidth",2.0)
+scatter([40,60,80],fkD)
 ylabel("Axial Stiffness (N/m)", 'Interpreter', 'latex', 'FontSize', 28)
 
 yyaxis right
 plot(Dv,kbD,'LineWidth',2)
 hold on
-scatter([40,60,80],fkbD, "LineWidth",2.0)
+scatter([40,60,80],fkbD)
 ylabel("Bending Stiffness (Nm/rad)", 'Interpreter', 'latex', 'FontSize', 28)
 
 legend(["Analytical", "FEM"])
-xlabel("$D$ (m)", 'Interpreter', 'latex', 'FontSize', 28)
+xlabel("D (m)", 'Interpreter', 'latex', 'FontSize', 28)
 set(gca,'FontSize',28)
 ax = gca;
 set(ax, 'TickLabelInterpreter', 'latex')
@@ -552,27 +473,23 @@ set(l, 'Interpreter', 'latex')
 % Turn on grid and box
 grid on
 box on 
-fig = gcf;
-if savef == 1
-    print(fig, "D", '-dpdf')
-end
 
 %%%%% H %%%%%
 figure
 yyaxis left
 plot(Hv,kH,'LineWidth',2)
 hold on
-scatter([0.12,0.145,0.17],fkH, "LineWidth",2.0)
+scatter([0.12,0.145,0.17],fkH)
 ylabel("Axial Stiffness (N/m)", 'Interpreter', 'latex', 'FontSize', 28)
 
 yyaxis right
 plot(Hv,kbH,'LineWidth',2)
 hold on
-scatter([0.12,0.145,0.17],fkbH, "LineWidth",2.0)
+scatter([0.12,0.145,0.17],fkbH)
 ylabel("Bending Stiffness (Nm/rad)", 'Interpreter', 'latex', 'FontSize', 28)
 
 legend(["Analytical", "FEM"])
-xlabel("$H$ (m)", 'Interpreter', 'latex', 'FontSize', 28)
+xlabel("H (m)", 'Interpreter', 'latex', 'FontSize', 28)
 set(gca,'FontSize',28)
 ax = gca;
 set(ax, 'TickLabelInterpreter', 'latex')
@@ -585,8 +502,16 @@ set(l, 'Interpreter', 'latex')
 % Turn on grid and box
 grid on
 box on 
-fig = gcf;
-if savef == 1
-    print(fig, "H", '-dpdf')
-end
+
+
+% Bending
+figure
+scatter(Nhv,kbNh)
+hold on
+scatter(Nhv,fkbNh)
+
+figure
+plot(wve,kbw,'LineWidth',2)
+hold on
+scatter([4, 8, 12],fkbw)
 

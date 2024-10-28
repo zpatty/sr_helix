@@ -27,16 +27,15 @@ MAX_VELOCITY = 20
 MAX_DELTA = 650                         # in degrees
 DEG_PER_PULSE = 0.088                   # to convert degrees to motor steps
 
-d = 0.04337                             # circumradius of hexagon plate (m)
-r = 0.004                               # spool radius (m)
 err = math.inf                          # start with large error
-mass_module = .05                       # in grams
-mj = mass_module*4
-m = mj
-mplate = 0.08                           # in kilograms
-hp = 0.007
-Lm = 0.013                              # distance between center of spool and centroid of bottom plate
-L0 = 0.09                               # lengths when modules are not stressed (in m)
+segment_mass = 0.071                    # in kg
+med_plates = 0.036                      # in kg
+end_plate = 0.023                       # in kg
+# end_plate = 0
+# screws = 18* 0.5                        # in kg
+m = 6*segment_mass + 5 * med_plates + end_plate
+Lm = 0.0                                # distance between center of spool and centroid of bottom plate
+L0 = 0.190                              # lengths when modules are not stressed (in m)
 
 # min and max are in mA because Dynamixel takes in mA inputs for current control
 max_torque = 250

@@ -59,6 +59,7 @@ class HelicoidRobot():
         self.l = [[0,0,0], [0,0,0], [0,0,0], [0,0,0]]
         self.s = self.L0
         self.r = robot_params['r']
+        self.d = robot_params['d']
         pos = self.Arm.get_position()
         self.th0 = copy.deepcopy([pos[:3], pos[3:6], pos[6:9]])
 
@@ -90,17 +91,17 @@ class HelicoidRobot():
 
     def update_cable_lens(self):
         pos = self.Arm.get_position()
-        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, r)  
+        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
 
     def grab_cable_lens(self):
         pos = self.Arm.get_position()
-        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, r)  
+        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
         return self.l
     
     def grab_q(self):
         pos = self.Arm.get_position()
         mj = self.Joint.get_position()[0]
-        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, r)  
+        self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
         l1 = self.l[0]
         l2 = self.l[1]
         l3 = self.l[2]
@@ -110,13 +111,21 @@ class HelicoidRobot():
         # print(f"m1: {m1}")
         # print(f"m2: {m1}")
         # print(f"m3: {m1}")
-
-        q = grab_helix_q(m1, m2, m3, mj, self.s, d)
+        q = grab_helix_q(m1, m2, m3, mj, self.s, self.d)
         # q = grab_helix_q(l1, l2, l3, mj, self.s, d)
         return q
 
     def send_torque(self, arm_tau, mod_tau):
         joint_cmds = [arm_tau[0]]
+        m1 = mod_tau[:3]
+        m2 = mod_tau[3:6]
+        m3 = mod_tau[6:]
+        # print(f"m1: {m1}")
+        # print(f"m2: {m2}")
+        # print(f"m3: {m3}")
+        mod_curr = [m3[0], m2[0], m1[0], m3[1], m2[1], m1[1], m3[2], m2[2], m1[2]]
+        # print(f"mod curr: {mod_curr}")
+
         self.Arm.send_torque_cmd(mod_tau)
         self.Joint.send_torque_cmd(joint_cmds)
 
@@ -210,7 +219,7 @@ def main():
             print(f"-------------- CONTROLLER MODE---------------------\n")
             helix_controller = load_helix_controller()
             qd_str = parse_setpoint()
-            qd = grab_helix_qd(qd_str)
+            qd = grab_helix_qd(qd_str, Robot.d)
             print(f"[DEBUG] qd: {qd}\n")
             xd = np.array([qd_str['xd'], qd_str['yd'], qd_str['zd']]).reshape(-1,1)
             zero = np.zeros((10,1))
@@ -250,7 +259,10 @@ def main():
                     break
                 else:
                     # run controller
-                    q = Robot.grab_q()
+                    try:
+                        q = Robot.grab_q()
+                    except:
+                        q = q_old
                     print(f"[DEBUG] q: {q}")
                     if first_time:
                         first_time = False
@@ -268,17 +280,19 @@ def main():
                     x_data=np.append(x_data, np.append(x,dx).reshape(-1,1), axis = 1) 
                     err = q - qd
                     err_dot = dq
-
-                    tau, cont = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,d,r,cntrl_params,helix_controller, Lm=Lm)                
+                    print(f"err: {err}\n")
+                    tau, cont = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
                     print(f"[DEBUG] tau: {tau}\n")
                     c_data = np.append(c_data, cont, axis=1) 
 
                     arm_input, mod_cmds = torque_to_current(tau,Robot.l)
+                    input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
                     print(f"[DEBUG] arm input: {arm_input}\n")
                     print(f"[DEBUG] mod cmds: {mod_cmds}\n")
-                    input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
-
+                    # arm_input = [2, 0, 0, 2, 0, 0, 2, 0, 0]
+                    # mod_cmds = 
                     # Robot.send_torque(arm_input, mod_cmds)
+                    
 
     # except:
     #     print("[ERROR] Shutting down robot \n")

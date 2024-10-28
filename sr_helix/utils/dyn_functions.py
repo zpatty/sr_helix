@@ -88,51 +88,39 @@ def grab_arm_current(tau, min_torque, max_torque):
     -----------------------------
     Ensures we only pass safe currents that the module can physically handle
     """
+    # print("-------------- arm current ---------------------")
     arm_input = [0] * 10
     for i in range(len(tau)):
-        if(i != 0):
-            if tau[i][0].item() < 0:
-                # negative current case
-                if tau[i][0].item() < -max_torque:
-                    arm_input[i] = -max_torque
-                elif tau[i][0].item() > -min_torque:
-                    arm_input[i] = 0
-                else:
-                    arm_input[i] = int(tau[i][0].item())
-            else:    
-                # positive current case
-                if tau[i][0].item() > max_torque:
-                    arm_input[i] = max_torque
-                elif tau[i][0].item() < min_torque:
-                    arm_input[i] = 0
-                else:
-                    arm_input[i] = int(tau[i][0].item())   
-        else:
-            if tau[i][0].item() < 0:
-                # negative current case
-                if tau[i][0].item() < -xm_max_torque:
-                    arm_input[i] = -xm_max_torque
-                elif tau[i][0].item() > -xm_min_torque:
-                    arm_input[i] = 0
-                else:
-                    arm_input[i] = int(tau[i][0].item())
-            else:    
-                # positive current case
-                if tau[i][0].item() > xm_max_torque:
-                    arm_input[i] = xm_max_torque
-                elif tau[i][0].item() < xm_min_torque:
-                    arm_input[i] = 0
-                else:
-                    arm_input[i] = int(tau[i][0].item())   
+        if tau[i][0].item() < 0:
+            # negative current case
+            if tau[i][0].item() < -xm_max_torque:
+                arm_input[i] = -xm_max_torque
+            elif tau[i][0].item() > -xm_min_torque:
+                arm_input[i] = 0
+            else:
+                arm_input[i] = int(tau[i][0].item())
+        else:    
+            # positive current case
+            if tau[i][0].item() > xm_max_torque:
+                arm_input[i] = xm_max_torque
+            elif tau[i][0].item() < xm_min_torque:
+                arm_input[i] = 0
+            else:
+                arm_input[i] = int(tau[i][0].item())   
     # print(f"Our new mod input: {mod_input}\n")
     return arm_input
 
 def torque_to_current(tau,l):
+    # print(f"------------torque to current method -----------------\n")
     tau_clip = np.concatenate((np.zeros((1,1)), tau[1:]))
+    # print(f"[DEBUG] tau clip: {tau_clip}")
     tau_cables = np.maximum(tau_clip,-30 * np.ones((10,1)))
+    # print(f"[DEBUG] tau cables: {tau_clip}")
     # put back og joint torque values since we didn't want to clip those
     tau_cables[0,0] = tau[0,0]
     arm_input = grab_arm_current(tau_cables, min_torque, max_torque)
+    # print(f"[DEBUG]  tau clip: {arm_input}")
+
     mod_clip =  arm_input[1:]
     for mod in range(len(limits)):
         for cable in range(len(limits[0])):
@@ -219,7 +207,7 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     q = np.array([mj0, dx1, dy1, dL1, dx2, dy2, dL2, dx3, dy3, dL3]).reshape(-1,1)
     return q
 
-def grab_helix_qd(qd_str):
+def grab_helix_qd(qd_str, d):
     """
     Returns the generalized coordinates of your desired state based off the following:
     for more detailed understanding of what these variables do, 

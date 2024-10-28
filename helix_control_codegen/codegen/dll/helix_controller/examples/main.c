@@ -5,7 +5,7 @@
  * File: main.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 24-Oct-2024 11:42:25
+ * C/C++ source code generated on  : 28-Oct-2024 17:40:15
  */
 
 /*************************************************************************/
@@ -36,7 +36,9 @@
 /* Include Files */
 #include "main.h"
 #include "helix_controller.h"
+#include "helix_controller_emxAPI.h"
 #include "helix_controller_terminate.h"
+#include "helix_controller_types.h"
 #include "rt_nonfinite.h"
 
 /* Function Declarations */
@@ -129,17 +131,17 @@ You do not need to do this more than one time. */
  */
 void main_helix_controller(void)
 {
-  double A[100];
+  emxArray_real_T *A;
+  emxArray_real_T *C;
+  emxArray_real_T *M;
+  emxArray_real_T *cq;
+  emxArray_real_T *tau;
   double Kp_tmp[100];
-  double M[100];
-  double C[10];
+  double x[36];
   double q_tmp[10];
-  double tau[10];
-  double tau_r[10];
-  double cq[3];
-  double x[3];
   double xd_tmp[3];
-  double d_tmp;
+  double N_tmp;
+  double tau_r;
   /* Initialize function 'helix_controller' input arguments. */
   /* Initialize function input argument 'q'. */
   argInit_10x1_real_T(q_tmp);
@@ -147,7 +149,7 @@ void main_helix_controller(void)
   /* Initialize function input argument 'qd'. */
   /* Initialize function input argument 'dqd'. */
   /* Initialize function input argument 'ddqd'. */
-  d_tmp = argInit_real_T();
+  N_tmp = argInit_real_T();
   /* Initialize function input argument 'Kp'. */
   argInit_10x10_real_T(Kp_tmp);
   /* Initialize function input argument 'KD'. */
@@ -156,10 +158,20 @@ void main_helix_controller(void)
   /* Initialize function input argument 'dxd'. */
   /* Initialize function input argument 'dxr'. */
   /* Call the entry-point 'helix_controller'. */
-  helix_controller(q_tmp, q_tmp, q_tmp, q_tmp, q_tmp, d_tmp, d_tmp, d_tmp,
-                   d_tmp, d_tmp, d_tmp, d_tmp, d_tmp, d_tmp, Kp_tmp, Kp_tmp,
-                   d_tmp, d_tmp, xd_tmp, xd_tmp, xd_tmp, d_tmp, d_tmp, tau,
-                   tau_r, x, M, C, A, cq);
+  emxInitArray_real_T(&tau, 1);
+  emxInitArray_real_T(&M, 2);
+  emxInitArray_real_T(&C, 1);
+  emxInitArray_real_T(&A, 2);
+  emxInitArray_real_T(&cq, 1);
+  helix_controller(q_tmp, q_tmp, q_tmp, q_tmp, q_tmp, N_tmp, N_tmp, N_tmp,
+                   N_tmp, N_tmp, N_tmp, N_tmp, N_tmp, N_tmp, N_tmp, Kp_tmp,
+                   Kp_tmp, N_tmp, N_tmp, xd_tmp, xd_tmp, xd_tmp, N_tmp, N_tmp,
+                   tau, &tau_r, x, M, C, A, cq);
+  emxDestroyArray_real_T(tau);
+  emxDestroyArray_real_T(M);
+  emxDestroyArray_real_T(C);
+  emxDestroyArray_real_T(A);
+  emxDestroyArray_real_T(cq);
 }
 
 /*

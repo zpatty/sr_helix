@@ -2,16 +2,17 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: mldivide.h
+ * File: MC_3_cg.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 24-Oct-2024 11:42:25
+ * C/C++ source code generated on  : 28-Oct-2024 17:40:15
  */
 
-#ifndef MLDIVIDE_H
-#define MLDIVIDE_H
+#ifndef MC_3_CG_H
+#define MC_3_CG_H
 
 /* Include Files */
+#include "helix_controller_types.h"
 #include "rtwtypes.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -21,9 +22,9 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void b_mldivide(const double A[100], double B[30]);
-
-void mldivide(const double A[100], double B[10]);
+void MC_3_cg(const double q[10], const double qd[10], double m, double r,
+             double L0, double N, emxArray_real_T *M, emxArray_real_T *C,
+             emxArray_real_T *J, double X[36]);
 
 #ifdef __cplusplus
 }
@@ -31,7 +32,7 @@ void mldivide(const double A[100], double B[10]);
 
 #endif
 /*
- * File trailer for mldivide.h
+ * File trailer for MC_3_cg.h
  *
  * [EOF]
  */

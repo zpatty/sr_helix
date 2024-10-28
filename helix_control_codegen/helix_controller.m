@@ -1,21 +1,21 @@
-function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
+function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,N,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
 
 
-qp = zeros(3,3);
-qp(:,1) = q(2:4);
-qp(:,2) = q(5:7);
-qp(:,3) = q(8:10);
+qp = zeros(3,N-1);
+for i=1:N-1
+    qp(:,i) = q(2 + 3*(i-1):4 + 3*(i-1));
+end
 
-[M, C] = MC_3_cg(q,dq,m,r,L0,d);
+[M, C, J, x] = MC_3_cg(q,dq,m,r,L0,d, N);
 
-K = diag([0; repmat([kb;kb;ks],3,1)]);
-D = diag([bm; repmat([bb;bb;bs],3,1)]);
+K = diag([0; repmat([kb;kb;ks],N-1,1)]);
+D = diag([bm; repmat([bb;bb;bs],N-1,1)]);
 
 % Fci = cell(1,4);
 % Ai = cell(1,4);
-Ai = zeros(3,3,3);
-cq = zeros(3,1);
-for i = 1:length(qp)
+Ai = zeros(3,3,N-1);
+cq = zeros(N-1,1);
+for i = 1:N-1
     dx = qp(1,i);
     dy = qp(2,i);
     dL = qp(3,i);
@@ -45,17 +45,25 @@ for i = 1:length(qp)
     At = [1,0,0;0,1,0;0,0,1]*-1;
     Ai(:,:,i) = Aq * At * Al;
 end
-A = blkdiag(1,Ai(:,:,1),Ai(:,:,2),Ai(:,:,3));
-conversion = diag([conv_motor, repmat([conv_pcc, conv_pcc, conv_pcc],1,3)]);
+% A = blkdiag(1,Ai(:,:,1),Ai(:,:,2),Ai(:,:,3));
+A = zeros(1 + (N-1)*3, 1 + (N-1)*3);
+A(1,1) = 1;
+for i=1:N-1
+    A(2 + 3*(i-1):4 + 3*(i-1),2 + 3*(i-1):4 + 3*(i-1)) = Ai(:,:,i);
+end
+
+conversion = diag([conv_motor, repmat([conv_pcc, conv_pcc, conv_pcc],1,N-1)]);
 tau = conversion*(A\(C + M*ddqd + K*qd + D*dqd + Kp*(qd-q) + KD*(dqd - dq)));
 
 Kpr = Kp;
 Kpr(1,1) = 0;
 KDr = KD;
 KDr(1,1) = 0;
-[J, x] = J_r(q,L0,d);
+% [J, x] = J_r(q,L0,d);
+J = J(1:3,:);
 Lam = eye(3)/(J * (M \ J'));
 Jbar = M \ J' * Lam;
-tau_r = conversion*(A\(C + J'*Jbar'*(K*q + D*dq) + J'*Lam*(Kpx*(xd-x) + KDx*(dxd - dxr))) + (eye(10) - J'*Jbar')*(-Kpr * q - KDr * dq));
+tau_r = 0;
+% tau_r = conversion*(A\(C + J'*Jbar'*(K*q + D*dq) + J'*Lam*(Kpx*(xd-x) + KDx*(dxd - dxr))) + (eye(10) - J'*Jbar')*(-Kpr * q - KDr * dq));
 end
 

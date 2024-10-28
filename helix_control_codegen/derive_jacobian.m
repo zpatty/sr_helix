@@ -44,14 +44,14 @@ Rz = @(x) [cos(x), -sin(x), 0;
 % del = sqrt(dx^2+dy^2);
 % syms del
 g = {};
-gbase = [Rz(th), [0; 0; 0]; 0 0 0 1];
+g{1} = [Rz(th), [0; 0; 0]; 0 0 0 1];
 g12 = gpcc(qp1(1),qp1(2),qp1(3),L0,d);
 g23 = gpcc(qp2(1),qp2(2),qp2(3),L0,d);
 g3e = gpcc(qp3(1),qp3(2),qp3(3),L0,d);
-g{1} = simplify(gbase*gpcc(qp1(1),qp1(2),qp1(3),L0/2,d));
-g{2} = simplify(gbase*g12*gpcc(qp2(1),qp2(2),qp2(3),L0/2,d));
-g{3} = simplify(gbase*g12*g23*gpcc(qp3(1),qp3(2),qp3(3),L0/2,d));
-g{4} = simplify(gbase*g12*g23*g3e*[eye(3) Rz(0)*[0.0; 0; 0]; 0 0 0 1]);
+g{2} = simplify(g{1}*gpcc(qp1(1),qp1(2),qp1(3),L0/2,d));
+g{3} = simplify(g{1}*g12*gpcc(qp2(1),qp2(2),qp2(3),L0/2,d));
+g{4} = simplify(g{1}*g12*g23*gpcc(qp3(1),qp3(2),qp3(3),L0/2,d));
+g_ee = simplify(g{1}*g12*g23*g3e*[eye(3) Rz(0)*[0.0; 0; 0]; 0 0 0 1]);
 
 % gc = sym(zeros(6,1));
 % syms phi
@@ -64,7 +64,7 @@ g{4} = simplify(gbase*g12*g23*g3e*[eye(3) Rz(0)*[0.0; 0; 0]; 0 0 0 1]);
 % dJ = simplify([jacobian(J(1),qp1)*dqp1, jacobian(J(2),qp1)*dqp1, jacobian(J(3),qp1)*dqp1]);
 
 % temp = simplify(g{2}*[eye(3) Rz(0)*[dc; 0; 0]; 0 0 0 1]);
-g_x = simplify(g{4}(1:3,4));
+g_x = simplify(g_ee(1:3,4));
 
 Jr = simplify(jacobian(g_x,q));
 vpa(subs(Jr, [d; L0; q; dc], [0.01; 0.1; 0.000000000001*ones(10,1); 0.001]))
@@ -77,28 +77,7 @@ vpa(subs(Jr, [d; L0; q; dc], [0.01; 0.1; 0.000000000001*ones(10,1); 0.001]))
 % 
 % limit(limit(J,dx,0),dy,0)
 % limit(limit(dJ,dx,0),dy,0)
-
-%%
-g = {};
-syms seg real
-syms r_c [3,1] real
-g{1} = simplify(gpcc(qp1(1),qp1(2),qp1(3),L0/3*seg,d));
-temp = g{1}*[eye(3) Rz(0)*[dc; 0; 0]; 0 0 0 1];
-gcr1 = simplify(temp(1:3,4));
-c = simplify(sqrt((gcr1(1) - r_c(1))^2 + (gcr1(2) - r_c(2))^2 + (gcr1(3) - r_c(3))^2));
-Jr1 = simplify(jacobian(c,[dx;dy;dL]));
-dJr1 = simplify([jacobian(Jr1(1),qp1)*dqp1, jacobian(Jr1(2),qp1)*dqp1, jacobian(Jr1(3),qp1)*dqp1]);
-limit(limit(gcr1,dx,0),dy,0)
-limit(limit(Jr1,dx,0),dy,0)
-limit(limit(dJr1,dx,0),dy,0)
-
-g{2} = simplify(g{1}*gpcc(qp2(1),qp2(2),qp2(3),L0/3*seg,d));
-temp = g{2}*[eye(3) Rz(0)*[dc; 0; 0]; 0 0 0 1];
-gcr2 = simplify(temp(1:3,4));
-c2 = simplify(sqrt((gcr2(1) - r_c(1))^2 + (gcr2(2) - r_c(2))^2 + (gcr2(3) - r_c(3))^2));
-
-Jr2 = simplify(jacobian(c2,qp2));
-dJr2 = simplify([jacobian(Jr2(1),qp2)*dqp2, jacobian(Jr2(2),qp2)*dqp2, jacobian(Jr2(3),qp2)*dqp2]);
+g = {g{1}, g{2}};
 
 %%
 ginvf = @(g) [g(1:3,1:3).' -g(1:3,1:3).'*g(1:3,4); zeros(1,3) 1];
@@ -122,7 +101,7 @@ for i=1:length(g)
     for j=1:length(q)
         Jg = [Jg (vee(ginv{i}*dg{i,j}))];
     end
-    J{i} = simplify(Jg);
+    J{i} = (Jg);
 end
 
 
@@ -142,7 +121,14 @@ I = {I1, I2};
 Mi = {};
 M = zeros(length(q));
 for i = 1:length(g)
-    Mi{i} = diag([m(i); m(i); m(i); I{i}]);
+    if i == 1
+        mi = m(1);
+        Ii = I1;
+    else
+        mi = m(2);
+        Ii = I2;
+    end
+    Mi{i} = diag([mi; mi; mi; Ii]);
     M = M + (J{i}.'*Mi{i}*J{i});
 end
 %%
@@ -168,7 +154,7 @@ C = C + christoffel(:,:,k)*dq(k);
 % C0 = C0 + christoffel0(:,:,k)*qd(k);
 end
 
-
+matlabFunction(C,"File","C_calc")
 % C0 = limit(limit(C,dx,0),dy,0)
 
 % C = simplify(subs(C,sqrt(dx^2+dy^2),delta));

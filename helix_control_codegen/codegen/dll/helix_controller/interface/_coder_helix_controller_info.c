@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_info.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 24-Oct-2024 11:42:25
+ * C/C++ source code generated on  : 28-Oct-2024 17:40:15
  */
 
 /* Include Files */
@@ -24,35 +24,32 @@ static const mxArray *c_emlrtMexFcnResolvedFunctionsI(void);
 static const mxArray *c_emlrtMexFcnResolvedFunctionsI(void)
 {
   const mxArray *nameCaptureInfo;
-  const char_T *data[8] = {
-      "789ced5a4b73d250140e151f0babac7cccb871e14a5b680b769cd19902f254b03c75da71"
-      "62486e49e0e6610294baf02fb8ea9ea5cb2efd1beefc0b8efe035d48"
-      "7ab9403273871898b45c72161c0e1ff77e8773b95fcedc8409e40a0186616e31c8be3d46"
-      "7e7d1487467e8db19a1d0f8cfc0d5b8ced2a13b48cc3f89791e755a5",
-      "03fa1d14289c0cc623055596144ee9544f34c0e8c050610f08e7c8910441559241653a28"
-      "9a919c9e82c6810999ef9322e0db95aecce8a231c9104e07e37a9c11"
-      "7e6fd0613d72847a846cf861ea7d58546510fec4f162b829753674a0a946d8d0591140a9"
-      "1f3e7f65cd32e92a1c7a01348162fd14027d53b6e5ff61cefcaf13f3",
-      "474821c9eeb07c73617cd7887c0811d46e0382c9ef1bccc9b747e4b3e22ed767549e4d79"
-      "567d6e3bccd7ee27df473befc7dafda6e9bde2fbf5e774cb4b3e6c17"
-      "c5d727cce7f4ff7687c017b2e16de57534dd8a9c18d57a2597cf16dfa50f1a89ec248ffd"
-      "193cb3f26008b157f30f08e3976ddf3acd97745d0c8d104e68b13c07",
-      "f98bd2d1af73f2c5897c56dce57ae0f238bebe2d6affff7c54035ef2615b153eaff4542e"
-      "2741b950cc4a071f53db4aab54af17847a861e3da56dff3acd3b688b"
-      "277923c46883e345f279dd9fbe20f2597197eb6296e77c4d68d5d387df3f6f78c9878d76"
-      "3d8d35b753119d2b1ed51ac64bedd56ebc078b99043d7a3a208cbfac",
-      "fda93667bef673197bbe183734ae2371c34474d530cf4b96b55f4d13f9acb85b5d9d2e93"
-      "29b0bebe2e860f1bedfa2a6a6fe26a4f4b94e4dd5a71e759aca995df"
-      "1e53a4afb4ed5fbf5f45e6f7abf3f1f97a8accef57ff6ffe01613cadfdeacd19f9627c3f"
-      "99645b1caf36244e31e365ed5753443e2bee727da6cb44b5be869fdc",
-      "7de0251f36daf5958f6aed564e11db5d352124f44ced69bf9ea5e87e156dfbd7bf6f85ec"
-      "b29d7b2fabae625b153effbed562e63f238c5f95e7abae10f347489e"
-      "d517cae7f579c073229f1577b93ec3f2a025f14a07527fef79fa7cd5dee9ef752ff9b0d1"
-      "aeab3092cf960adc56acdaa9460b511891aa1c4c2ebfaefe030aa486",
-      "9a",
+  const char_T *data[7] = {
+      "789ced594f73d240140f0e6a0ffee1a4170ff6a0176da3d0dae9c19902a5800eb150c019"
+      "1d275d926d1248b231018a1c3c7bf32b70f4e857f12b78f3e647b021"
+      "594232b343244c5ab679071e8f1fbbbf97f7d81f6f122655ada51886b9c73876fad4f177"
+      "dd38e3fa1b8cdf8278caf5b70331b69b4cdab70ee3df5d2f20bd0f47",
+      "7d27d08106672b45a4293ad0fbcd2f06644c68217508c52972a6a8b0a968f0643ee0ec48"
+      "3b9a8366810dd9ef8b32147a27038d3165cbcb509d0f66f5f849b8de"
+      "74c87a5409f5c804f08fa54fac8c34c88e8120b392d2df32a1812cd6327919aaca889dbe"
+      "f276994ca45e78114a50f77faa42735b0be47f1a317f523f332e522b",
+      "f2395e9056c6778bc8e720221a7454e85ddf2422df0191cf8f2fd91fb73cdbdaa2fadc0f"
+      "996fd07bdfdf98fa67e9c792ede3e2fbf6f7f77e9c7cd82e8b6f44d8"
+      "2fecefed01812f13c0cd6c7ddcdca98d7365f0863b94f27abedd7a59f2f2385ec0b3280f"
+      "8610c7b5ff84b07eddce6dd87c3702b197af8300b1cb0b40152e4b47",
+      "7f44e4cb13f9fcf892fdc0e509fdffb6aaf3ffe7490bc6c987edbaf0c5a5a75aa3081b35"
+      "aea27cf85ccaeadd7abb5d13db657af494b6f31b36ef7420f6f27610"
+      "ab07cf57c917f77cfa9ac8e7c797ec8b5d9e694f68d5d3cd5f5fb7e2e4c346bb9eee4ad9"
+      "d20b137067ad8e7568bcddcb0f55ae5ca0474f2784f557753e3522e6",
+      "1bbc2f13cc17e39601fa0ab848c444967dbf645de7d523229f1f5f5657e7cb640b6ca2af"
+      "abe1c346bbbecac6bb3c1a1a85bab6d7e272fbbb92d1787f4e91bed2"
+      "767e9379d5b1645e8dc697e8a963c9bcfa7ffb4f08eb699d57ef2cc817e3c7c522df0502"
+      "ea2840b7e3759d574b443e3fbe647fe6cb44b5beb2cf1f3e8a930f1b",
+      "edfa2aec18bd6e55977b0354100b66b9f56ad4ae54e8d157dace6ff2dccab1ab76df7b5d"
+      "7515db75e14b9e5b45dbff1fdc113a0e",
       ""};
   nameCaptureInfo = NULL;
-  emlrtNameCaptureMxArrayR2016a(&data[0], 11216U, &nameCaptureInfo);
+  emlrtNameCaptureMxArrayR2016a(&data[0], 9848U, &nameCaptureInfo);
   return nameCaptureInfo;
 }
 
@@ -79,11 +76,11 @@ mxArray *emlrtMexFcnProperties(void)
       "FullPath", "TimeStamp",      "Constructor",     "Visible"};
   xEntryPoints =
       emlrtCreateStructMatrix(1, 1, 8, (const char_T **)&epFieldName[0]);
-  xInputs = emlrtCreateLogicalMatrix(1, 23);
+  xInputs = emlrtCreateLogicalMatrix(1, 24);
   emlrtSetField(xEntryPoints, 0, "Name",
                 emlrtMxCreateString("helix_controller"));
   emlrtSetField(xEntryPoints, 0, "NumberOfInputs",
-                emlrtMxCreateDoubleScalar(23.0));
+                emlrtMxCreateDoubleScalar(24.0));
   emlrtSetField(xEntryPoints, 0, "NumberOfOutputs",
                 emlrtMxCreateDoubleScalar(7.0));
   emlrtSetField(xEntryPoints, 0, "ConstantInputs", xInputs);
@@ -92,7 +89,7 @@ mxArray *emlrtMexFcnProperties(void)
       emlrtMxCreateString("/home/zach/git-repos/sr_helix/helix_control_codegen/"
                           "helix_controller.m"));
   emlrtSetField(xEntryPoints, 0, "TimeStamp",
-                emlrtMxCreateDoubleScalar(739548.42464120372));
+                emlrtMxCreateDoubleScalar(739553.72140046291));
   emlrtSetField(xEntryPoints, 0, "Constructor",
                 emlrtMxCreateLogicalScalar(false));
   emlrtSetField(xEntryPoints, 0, "Visible", emlrtMxCreateLogicalScalar(true));
@@ -103,7 +100,7 @@ mxArray *emlrtMexFcnProperties(void)
   emlrtSetField(xResult, 0, "ResolvedFunctions",
                 (mxArray *)c_emlrtMexFcnResolvedFunctionsI());
   emlrtSetField(xResult, 0, "Checksum",
-                emlrtMxCreateString("5KhMDmcLi57OLkh3TREVt"));
+                emlrtMxCreateString("8wg3TCGbIGNOOz86czPxp"));
   emlrtSetField(xResult, 0, "EntryPoints", xEntryPoints);
   return xResult;
 }

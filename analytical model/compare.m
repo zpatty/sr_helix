@@ -70,7 +70,7 @@ for j = 1:3
 end
 
 wve = linspace(2,20);
-% wve = [4, 8, 12];
+wve = [4, 8, 12];
 for j = 1:length(wve)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
@@ -143,14 +143,15 @@ for j = 1:length(wve)
     % A = pi*(rm)^2;
     % A = pi*(r^2 - ri^2);
     If = pi/4 * (rm^4);
+    % If = pi*rm^3*w;
     A = pi*(rm)^2;
     kbw(j) = 1/(y/r) /Nh*Nh/pi;
-    kbw(j) = kw(j)*If/A*rm/H*3*3;
+    kbw(j) = kw(j)*If/H;
 end
 
 tv = linspace(1,8);
 % tv = [2,4,6];
-for j = 1:length(wve)
+for j = 1:length(tv)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
     w = 8/1000;
@@ -220,7 +221,7 @@ for j = 1:length(wve)
 end
 
 Dv = linspace(20,100);
-% Dv = [40,60,80];
+Dv = [40,60,80];
 for j = 1:length(Dv)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
@@ -305,17 +306,19 @@ for j = 1:length(Dv)
     
     kbD(j) = 1/(y/r) /Nh*Nh/pi;
     % kbD(j) = 2/pi*kD(j)*Dm^2*4;
-    % A = pi*(r^2 - ri^2);
+    A = pi*(r^2 - ri^2);
+    If = pi/4 * (r^4 - ri^4);
     If = pi/4 * (rm^4);
-    A = pi*(rm)^2;
+    % If = pi*rm^3*w;
+    % A = pi*(rm)^2;
     y = 1/12 * (Lo) .^3 ./ I / E * cosd(alpha)^2;  %needs * 4/3, 2 from other side
     kbD(j) = kD(j)*If/A*r/ri/2;
-    kbD(j) = kD(j)*If/A*rm/H*3*3;
+    kbD(j) = kD(j)*If/H*115;
 end
 
 Hv = linspace(0.05,0.2);
 % Hv = [0.12, 0.145, 0.17];
-for j = 1:length(wve)
+for j = 1:length(Hv)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
     w = 8/1000;
@@ -424,7 +427,7 @@ fkbD = 0.001./[1.0, 0.79, 0.78]/(pi/180);
 fkbH = 0.001./[0.53, 0.79, 1.05]/(pi/180);
 
 
-savef = 1;
+savef = 0;
 % Compression
 figure
 yyaxis left

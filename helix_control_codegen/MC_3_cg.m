@@ -3,7 +3,7 @@
 % given the current state and geometric parameters of the pushpuppet robot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [M, C] = MC_3_cg(q,qd,m,r,L0,d)
+function [M, C, J, X] = MC_3_cg(q,qd,m,r,L0,d,N)
 % q = state
 % qd = velocity
 % qdd = acceleration
@@ -16,44 +16,49 @@ function [M, C] = MC_3_cg(q,qd,m,r,L0,d)
 % d = distance to cable;
 % N = number of links (number of modules plus number of motors)
 
-N = 4;
-a_grav = [0;0;9.81;0;0;0];
+a_grav = [0;0;9.81/2;0;0;0];
 
 % qi = {1, 2:4, 5, 6:8, 9, 10:12, 13, 14:16};
-
-I = zeros(6,6,4);
+Nq = 1 + (N-1)*3;
+I = zeros(6,6,N);
+m_motors = 0.738;
 inertia = [1/4*m*r^2; 1/4*m*r^2; 1/2*m*r^2];
-I(:,:,1) = diag([m;m;m;inertia]);
-I(:,:,2) = I(:,:,1);
-I(:,:,3) = I(:,:,1);
-I(:,:,4) = I(:,:,1);
+r_motors = 0.212/2;
+inertia_motors = [1/4*m_motors*r_motors^2; 1/4*m_motors*r_motors^2; 1/2*m_motors*r_motors^2];
+I(:,:,1) = diag([m_motors;m_motors;m_motors;inertia_motors]);
+I(:,:,2) = diag([m;m;m;inertia]);
+for i=3:N
+    I(:,:,i) = diag([m;m;m;inertia]);
+end
 
 
-Smod = zeros(6,3,3);
+Smod = zeros(6,3,N-1);
+XJ = zeros(6,6,N);
 Smotz = [0;0;0;0;0;1];
 Smoty = [0;0;0;0;1;0];
-Xup = zeros(6,6,4);
-v = zeros(6,4);
-a = zeros(6,4);
-f = zeros(6,4);
-C = zeros(10,1);
-
+Xup = zeros(6,6,N);
+v = zeros(6,N);
+a = zeros(6,N);
+f = zeros(6,N);
+C = zeros(Nq,1);
+J = zeros(6,1 + (N-1)*3);
 Xtree = eye(6); %[diag(ones(3,1)) [0;0;0]; 0 0 0 1];
 i = 1;
 qi = 1;
 g = [cos(q(qi)) -sin(q(qi)) 0 0; sin(q(qi)) cos(q(qi)) 0 0; 0 0 1 0; 0 0 0 1];
-XJ = adj_calc(g,1);
-Xup(:,:,1) = XJ*Xtree;
+XJ(:,:,1) = adj_calc(g,1);
+Xup(:,:,1) = XJ(:,:,1)*Xtree;
 vJ = Smotz*qd(qi);
 v(:,i) = vJ;
 a(:,i) = Xup(:,:,1)*(-a_grav) + spatial_cross(v(:,i))*vJ;
 f(:,i) = I(:,:,i)*a(:,i) + -spatial_cross(v(:,i)).'*I(:,:,i)*v(:,i);
-
+X = Xup(:,:,1);
 % Recursive Newton Euler to Calculate C+G
 for i = 2:N
     qi = (i-2)*3 + 2:(i-2)*3 + 4;
-    [XJ, Smod(:,:,i-1),~,dJ] = PCC_jacobian(q(qi),d,L0,qd(qi));
-    Xup(:,:,i) = XJ*Xtree;
+    [XJ(:,:,i), Smod(:,:,i-1),~,dJ] = PCC_jacobian(q(qi),r,L0,qd(qi));
+    Xup(:,:,i) = XJ(:,:,i)*Xtree;
+    X = Xup(:,:,i)*X;
     Xtree = eye(6);
     vJ = Smod(:,:,i-1)*qd(qi);
 
@@ -62,14 +67,18 @@ for i = 2:N
     f(:,i) = I(:,:,i)*a(:,i) + -spatial_cross(v(:,i)).'*I(:,:,i)*v(:,i);
 end
 
+X_out = X;
 for i = N:-1:1
     if i == 1
         qi = 1;
         C(qi,1) = 2 * Smotz' * f(:,i);
+        J(:, qi) = X * Smotz;
     else
         qi = (i-2)*3 + 2:(i-2)*3 + 4;
         C(qi,1) = 2 * Smod(:,:,i-1)' * f(:,i);
         f(:,i-1) = f(:,i-1) + Xup(:,:,i)'*f(:,i);
+        J(:, qi) = X * Smod(:,:,i-1);
+        X = X *  XJ(:,:,i) * Xtree;
     end
 end
 
@@ -82,7 +91,7 @@ for i = N:-1:1
     end
 end
 
-H = zeros(10);
+H = zeros(Nq,Nq);
 % fh3 = zeros(6,3);
 % fh1 = zeros(6,1);
 

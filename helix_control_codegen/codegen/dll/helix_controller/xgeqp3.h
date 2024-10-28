@@ -2,16 +2,17 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: mtimes.h
+ * File: xgeqp3.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 24-Oct-2024 11:42:25
+ * C/C++ source code generated on  : 28-Oct-2024 17:40:15
  */
 
-#ifndef MTIMES_H
-#define MTIMES_H
+#ifndef XGEQP3_H
+#define XGEQP3_H
 
 /* Include Files */
+#include "helix_controller_types.h"
 #include "rtwtypes.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -21,7 +22,7 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void mtimes(const double A[30], const double B[30], double C[100]);
+void xgeqp3(emxArray_real_T *A, emxArray_real_T *tau, emxArray_int32_T *jpvt);
 
 #ifdef __cplusplus
 }
@@ -29,7 +30,7 @@ void mtimes(const double A[30], const double B[30], double C[100]);
 
 #endif
 /*
- * File trailer for mtimes.h
+ * File trailer for xgeqp3.h
  *
  * [EOF]
  */

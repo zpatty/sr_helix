@@ -2,7 +2,7 @@
 ## Makefile generated for component 'helix_controller'. 
 ## 
 ## Makefile     : helix_controller_rtw.mk
-## Generated on : Thu Oct 24 11:43:03 2024
+## Generated on : Mon Oct 28 17:40:45 2024
 ## Final product: ./helix_controller.so
 ## Product type : dynamic-library
 ## 
@@ -167,7 +167,7 @@ DEFINES = $(DEFINES_CUSTOM) $(DEFINES_STANDARD)
 ## SOURCE FILES
 ###########################################################################
 
-SRCS = $(START_DIR)/codegen/dll/helix_controller/rt_nonfinite.c $(START_DIR)/codegen/dll/helix_controller/rtGetNaN.c $(START_DIR)/codegen/dll/helix_controller/rtGetInf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_initialize.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_terminate.c $(START_DIR)/codegen/dll/helix_controller/helix_controller.c $(START_DIR)/codegen/dll/helix_controller/repmat.c $(START_DIR)/codegen/dll/helix_controller/diag.c $(START_DIR)/codegen/dll/helix_controller/J_r.c $(START_DIR)/codegen/dll/helix_controller/mrdivide_helper.c $(START_DIR)/codegen/dll/helix_controller/mtimes.c $(START_DIR)/codegen/dll/helix_controller/blkdiag.c $(START_DIR)/codegen/dll/helix_controller/mldivide.c $(START_DIR)/codegen/dll/helix_controller/xgetrf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_rtwutil.c
+SRCS = $(START_DIR)/codegen/dll/helix_controller/rt_nonfinite.c $(START_DIR)/codegen/dll/helix_controller/rtGetNaN.c $(START_DIR)/codegen/dll/helix_controller/rtGetInf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_initialize.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_terminate.c $(START_DIR)/codegen/dll/helix_controller/helix_controller.c $(START_DIR)/codegen/dll/helix_controller/MC_3_cg.c $(START_DIR)/codegen/dll/helix_controller/PCC_jacobian.c $(START_DIR)/codegen/dll/helix_controller/xnrm2.c $(START_DIR)/codegen/dll/helix_controller/cosd.c $(START_DIR)/codegen/dll/helix_controller/xgeqp3.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_emxutil.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_emxAPI.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_rtwutil.c
 
 ALL_SRCS = $(SRCS)
 
@@ -175,7 +175,7 @@ ALL_SRCS = $(SRCS)
 ## OBJECTS
 ###########################################################################
 
-OBJS = rt_nonfinite.o rtGetNaN.o rtGetInf.o helix_controller_initialize.o helix_controller_terminate.o helix_controller.o repmat.o diag.o J_r.o mrdivide_helper.o mtimes.o blkdiag.o mldivide.o xgetrf.o helix_controller_rtwutil.o
+OBJS = rt_nonfinite.o rtGetNaN.o rtGetInf.o helix_controller_initialize.o helix_controller_terminate.o helix_controller.o MC_3_cg.o PCC_jacobian.o xnrm2.o cosd.o xgeqp3.o helix_controller_emxutil.o helix_controller_emxAPI.o helix_controller_rtwutil.o
 
 ALL_OBJS = $(OBJS)
 
@@ -402,35 +402,31 @@ helix_controller.o : $(START_DIR)/codegen/dll/helix_controller/helix_controller.
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-repmat.o : $(START_DIR)/codegen/dll/helix_controller/repmat.c
+MC_3_cg.o : $(START_DIR)/codegen/dll/helix_controller/MC_3_cg.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-diag.o : $(START_DIR)/codegen/dll/helix_controller/diag.c
+PCC_jacobian.o : $(START_DIR)/codegen/dll/helix_controller/PCC_jacobian.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-J_r.o : $(START_DIR)/codegen/dll/helix_controller/J_r.c
+xnrm2.o : $(START_DIR)/codegen/dll/helix_controller/xnrm2.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-mrdivide_helper.o : $(START_DIR)/codegen/dll/helix_controller/mrdivide_helper.c
+cosd.o : $(START_DIR)/codegen/dll/helix_controller/cosd.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-mtimes.o : $(START_DIR)/codegen/dll/helix_controller/mtimes.c
+xgeqp3.o : $(START_DIR)/codegen/dll/helix_controller/xgeqp3.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-blkdiag.o : $(START_DIR)/codegen/dll/helix_controller/blkdiag.c
+helix_controller_emxutil.o : $(START_DIR)/codegen/dll/helix_controller/helix_controller_emxutil.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-mldivide.o : $(START_DIR)/codegen/dll/helix_controller/mldivide.c
-	$(CC) $(CFLAGS) -o "$@" "$<"
-
-
-xgetrf.o : $(START_DIR)/codegen/dll/helix_controller/xgetrf.c
+helix_controller_emxAPI.o : $(START_DIR)/codegen/dll/helix_controller/helix_controller_emxAPI.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 

@@ -2,16 +2,17 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: diag.h
+ * File: xnrm2.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 24-Oct-2024 11:42:25
+ * C/C++ source code generated on  : 28-Oct-2024 17:40:15
  */
 
-#ifndef DIAG_H
-#define DIAG_H
+#ifndef XNRM2_H
+#define XNRM2_H
 
 /* Include Files */
+#include "helix_controller_types.h"
 #include "rtwtypes.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -21,7 +22,7 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void diag(const double v[10], double d[100]);
+double xnrm2(int n, const emxArray_real_T *x, int ix0);
 
 #ifdef __cplusplus
 }
@@ -29,7 +30,7 @@ void diag(const double v[10], double d[100]);
 
 #endif
 /*
- * File trailer for diag.h
+ * File trailer for xnrm2.h
  *
  * [EOF]
  */

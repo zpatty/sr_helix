@@ -1,0 +1,15 @@
+{
+    "Arm_IDs": [1,2,3,4,5,6,7,8,9],
+    "Joint_IDs": [10],
+    "L0": 0.190,
+    "r": 0.01075,
+    "d": 0.0395,
+    "th0" : [0,0,0,0,0,0],
+    "joint_th0": [0],
+    "base_offsets": [0],
+    "baudrate": 2000000,
+    "protocol_version": 2.0,
+    "mod_device": "/dev/ttyUSB1",
+    "joint_device": "/dev/ttyUSB1",
+    "max_profile_velocity": 50
+}

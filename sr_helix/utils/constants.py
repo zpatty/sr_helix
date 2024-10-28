@@ -48,7 +48,6 @@ xm_min_torque = 2
 l1_0 = [L0, L0, L0]
 l2_0 = [L0, L0, L0]
 l3_0 = [L0, L0, L0]
-l4_0 = [L0, L0, L0]
 
-limits = [l1_0, l2_0, l3_0, l4_0]
+limits = [l1_0, l2_0, l3_0]
 

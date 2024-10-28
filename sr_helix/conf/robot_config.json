@@ -8,7 +8,7 @@
     "base_offsets": [0],
     "baudrate": 2000000,
     "protocol_version": 2.0,
-    "mod_device": "/dev/ttyUSB0",
-    "joint_device": "/dev/ttyUSB0",
+    "mod_device": "/dev/ttyUSB1",
+    "joint_device": "/dev/ttyUSB1",
     "max_profile_velocity": 50
 }

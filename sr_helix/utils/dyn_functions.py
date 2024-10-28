@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import math
+import json
+import scipy.io
+import numpy as np
 from datetime import datetime
 from math import cos, sin
-import numpy as np
-import scipy.io
 from utils.constants import *
 
 def calc_error(p_d, p_0):
@@ -38,6 +39,7 @@ def to_rad_secs(revs):
     """
     rad_sec = revs * (2 * math.pi)/60
     return rad_sec
+
 def diff(q, q_old, dt):
     """
     Input: current config and old config
@@ -73,58 +75,6 @@ def get_qindex(mod_clock, tvec):
             return qindex
     return qindex
 
-def mat2np(fname, typ):
-    """
-    Function that converts mat file to numpy matrix
-    Parameters
-    ----------------------------
-        **both inputs are in string format
-        fname = name of the file, i.e 'q.mat'
-        typ = name of matrix you're trying to pull from dictionary, i.e 'q'
-    """
-    mat = scipy.io.loadmat(fname)[typ]
-    # # for the 56 samples you created grab the gen coords
-    return mat
-
-def grab_current(tau_cables, min_torque, max_torque):
-    """
-    Parameters
-    ----------------------------
-    tau_cables: the raw currents calculated from controller (in mA?)
-    min_torque: the minimum torque required to actuate module
-    max_torque: the maximum torque module can be actuated without 
-                damaging the module (basially point where plates touch)
-    l: current cable lengths
-        can do something like if current makes no
-    Returns
-    -----------------------------
-    Ensures we only pass safe currents that the module can physically handle
-    """
-    mod_input = [0, 0, 0]
-    for i in range(len(tau_cables)):
-        if tau_cables[i][0].item() < 0:
-            # negative current case
-            if tau_cables[i][0].item() < -max_torque:
-                mod_input[i] = -max_torque
-            elif tau_cables[i][0].item() > -min_torque:
-                mod_input[i] = 0
-            else:
-                mod_input[i] = int(tau_cables[i][0].item())
-        else:    
-            # positive current case
-            if tau_cables[i][0].item() > max_torque:
-                mod_input[i] = max_torque
-            elif tau_cables[i][0].item() < min_torque:
-                mod_input[i] = 0
-            else:
-                mod_input[i] = int(tau_cables[i][0].item())   
-    m1 = mod_input[0]
-    m2 = mod_input[1]
-    m3 = mod_input[2]
-    mod_input = [m1, m2, m3]
-    # print(f"Our new mod input: {mod_input}\n")
-    return mod_input
-
 def grab_arm_current(tau, min_torque, max_torque):
     """
     Parameters
@@ -138,9 +88,9 @@ def grab_arm_current(tau, min_torque, max_torque):
     -----------------------------
     Ensures we only pass safe currents that the module can physically handle
     """
-    arm_input = [0] * 16
+    arm_input = [0] * 10
     for i in range(len(tau)):
-        if(i != 0 and i != 4 and i != 8 and i != 12):
+        if(i != 0):
             if tau[i][0].item() < 0:
                 # negative current case
                 if tau[i][0].item() < -max_torque:
@@ -177,52 +127,37 @@ def grab_arm_current(tau, min_torque, max_torque):
     # print(f"Our new mod input: {mod_input}\n")
     return arm_input
 
-def grab_cable_lens(Mod1, l1, l1_0, th0, r):
-    """
-    Reads current motor angles from a module to calculate the current
-    cable lengths.
-    """
-    dtheta1 = [0, 0, 0]
-    for i in range(len(Mod1)):
-        th1 = to_radians(Mod1[i].get_present_pos())
-        dtheta1[i] = th1 - th0[i]
-    for i in range(len(l1)):
-        l1[i] = l1_0[i] - (dtheta1[i] * r)
-    return l1
+def torque_to_current(tau,l):
+    tau_clip = np.concatenate((np.zeros((1,1)), tau[1:]))
+    tau_cables = np.maximum(tau_clip,-30 * np.ones((10,1)))
+    # put back og joint torque values since we didn't want to clip those
+    tau_cables[0,0] = tau[0,0]
+    arm_input = grab_arm_current(tau_cables, min_torque, max_torque)
+    mod_clip =  arm_input[1:]
+    for mod in range(len(limits)):
+        for cable in range(len(limits[0])):
+            idx = (mod * 3) + cable
+            idx2 = (mod * 4) + cable
+            if mod_clip[idx] < 0:
+                if l[mod][cable] >= limits[mod][cable]:
+                    mod_clip[idx] = 0
+    mod_cmds = mod_clip
+    return arm_input, mod_cmds
 
-def  grab_arm_cable_lens(pos, l, l0, th0, r):
-    """
-    Reads current motor angles from a module to calculate the current
-    cable lengths.
-    Arm = Mod class instance
-    l = [l1, l2, l3]
-    l1  = [l11, l21, l31]
-    l0 = [l1_0, l2_0, l3_0]
-    th0 = [th01, th02, th03]
-    th01 = [m10, m20, m30]
-    """
-    pos = [pos[:3], pos[3:6], pos[6:9], pos[9:]]
-    for i in range(len(pos)):
-        # grab cable lengths for each module
-        dth = [0, 0, 0, 0]
-        for j in range(len(pos[0])):
-            # into 3 motors
-            th = pos[i][j]
-            dth[j] = th - th0[i][j]
-        for k in range(len(l[i])):
-            l[i][k] = l0[i][k] - (dth[k] * r)
-    return l
-
-def  grab_helix_cable_lens(pos, l, l0, th0, r):
+def grab_helix_cable_lens(pos, l, l0, th0, r):
     """
     Reads current motor angles from a module to calculate the current
     cable lengths.
     Arm = Mod class instance
     """
+    # print("[DEBUG] in cable method")
     pos = [pos[:3], pos[3:6], pos[6:9]]
-    print(f"pos: {pos}")
+    # print(f"[DEBUG] pos: {pos}")
+    # print(f"[DEBUG] th0: {th0}")
+    # print(f"[DEBUG] l0: {l0}")
+
     for i in range(len(pos)):
-        print(f"i: {i}")
+        # print(f"i: {i}")
         # grab cable lengths for each module
         dth = [0, 0, 0]
         for j in range(len(pos[0])):
@@ -233,7 +168,7 @@ def  grab_helix_cable_lens(pos, l, l0, th0, r):
             l[i][k] = l0[i][k] - (dth[k] * r)
     return l
 
-def grab_helicoid_q(l1, l2, l3, mj0, s, d):
+def grab_helix_q(l1, l2, l3, mj0, s, d):
     """
     Params: 
     @l1: cable lengths for mod 1
@@ -245,23 +180,38 @@ def grab_helicoid_q(l1, l2, l3, mj0, s, d):
     Returns:
     @q:  generalized coordinates [dx, dy, dL]
     """
-    phi1 = math.atan2(((math.sqrt(3)/3) * (l1[1] + l1[0] - 2 * l1[2])),(l1[0] - l1[1]))
-    k1 = 2 * math.sqrt(l1[2]**2 + l1[0]**2 + l1[1]**2 - (l1[2]*l1[0]) - (l1[0] * l1[1]) - (l1[2]*l1[1]))/(d* (l1[2] + l1[0] + l1[1] + 3 * Lm))
-    phi2 = math.atan2(((math.sqrt(3)/3) * (l2[1] + l2[0] - 2 * l2[2])),(l2[0] - l2[1]))
-    k2 = 2 * math.sqrt(l2[2]**2 + l2[0]**2 + l2[1]**2 - (l2[2]*l2[0]) - (l2[0] * l2[1]) - (l2[2]*l2[1]))/(d* (l2[2] + l2[0] + l2[1]+ 3 * Lm))
-    phi3 = math.atan2(((math.sqrt(3)/3) * (l3[1] + l3[0] - 2 * l3[2])),(l3[0] - l3[1]))
-    k3 = 2 * math.sqrt(l3[2]**2 + l3[0]**2 + l3[1]**2 - (l3[2]*l3[0]) - (l3[0] * l3[1]) - (l3[2]*l3[1]))/(d* (l3[2] + l3[0] + l3[1]+ 3 * Lm))
+    # need to flip direction for mod 1 and mod 3
 
-    s_curr1 = (l1[2] + l1[0] + l1[1])/3
-    s_curr2 = (l2[2] + l2[0] + l2[1])/3
-    s_curr3 = (l3[2] + l3[0] + l3[1])/3
+    l1_1 = l1[0]
+    l1_2 = l1[1]
+    l1_3 = l1[2]
+    phi1 = math.atan2(((math.sqrt(3)/3) * (l1_3 + l1_2 - 2 * l1_1)),(l1_2 - l1_3)) 
+    k1 = 2 * math.sqrt(l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3))/(d* (l1_1 + l1_2 + l1_3+ 3 * Lm))
+    
+    l2_1 = l2[0]
+    l2_2 = l2[2]
+    l2_3 = l2[1]
+    phi2 = math.atan2(((math.sqrt(3)/3) * (l2_3 + l2_2 - 2 * l2_1)),(l2_2 - l2_3)) + np.pi
+    k2 = 2 * math.sqrt(l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3))/(d* (l2_1 + l2_2 + l2_3+ 3 * Lm))
+    
+    l3_1 = l3[1]
+    l3_2 = l3[2]
+    l3_3 = l3[0]
+    phi3 = math.atan2(((math.sqrt(3)/3) * (l3_3 + l3_2 - 2 * l3_1)),(l3_2 - l3_3))
+    k3 = 2 * math.sqrt(l3_1**2 + l3_2**2 + l3_3**2 - (l3_1*l3_2) - (l3_2 * l3_3) - (l3_1*l3_3))/(d* (l3_1 + l3_2 + l3_3+ 3 * Lm))
+
+    s_curr1 = (l1_1 + l1_2 + l1_3)/3
+    s_curr2 = (l2_1 + l2_2 + l2_3)/3
+    s_curr3 = (l3_1 + l3_2 + l3_3)/3
 
     dL1 = s_curr1 - s
     dx1 = k1 * s_curr1 * d * cos(phi1)
     dy1 = k1 * s_curr1 * d * sin(phi1)
+
     dL2 = s_curr2 - s
     dx2 = k2 * s_curr2 * d * cos(phi2)
     dy2 = k2 * s_curr2 * d * sin(phi2)
+    
     dL3 = s_curr3 - s 
     dx3 = k3 * s_curr3 * d * cos(phi3)
     dy3 = k3 * s_curr3 * d * sin(phi3)
@@ -269,7 +219,7 @@ def grab_helicoid_q(l1, l2, l3, mj0, s, d):
     q = np.array([mj0, dx1, dy1, dL1, dx2, dy2, dL2, dx3, dy3, dL3]).reshape(-1,1)
     return q
 
-def grab_qd(qd_str):
+def grab_helix_qd(qd_str):
     """
     Returns the generalized coordinates of your desired state based off the following:
     for more detailed understanding of what these variables do, 

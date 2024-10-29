@@ -263,7 +263,7 @@ def main():
                         q = Robot.grab_q()
                     except:
                         q = q_old
-                    print(f"[DEBUG] q: {q}")
+                    # print(f"[DEBUG] q: {q}")
                     if first_time:
                         first_time = False
                         dq = np.zeros((10,1))
@@ -271,6 +271,9 @@ def main():
                         x = np.zeros((3,1))
                     else:
                         t = time.time()
+                        time_elapsed = t-t_0
+                        timestamps = np.append(timestamps, time_elapsed) 
+
                         dt = t - t_old
                         dq = diff(q, q_old, dt)
                 
@@ -280,15 +283,18 @@ def main():
                     x_data=np.append(x_data, np.append(x,dx).reshape(-1,1), axis = 1) 
                     err = q - qd
                     err_dot = dq
-                    print(f"err: {err}\n")
+                    # print(f"err: {err}\n")
                     tau, cont = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
                     print(f"[DEBUG] tau: {tau}\n")
                     c_data = np.append(c_data, cont, axis=1) 
 
                     arm_input, mod_cmds = torque_to_current(tau,Robot.l)
                     input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
-                    print(f"[DEBUG] arm input: {arm_input}\n")
-                    print(f"[DEBUG] mod cmds: {mod_cmds}\n")
+                    tau_data=np.append(tau_data, tau, axis=1) 
+
+                    # print(f"[DEBUG] mod cmds: {mod_cmds}\n")
+
+                    # print(f"[DEBUG] arm input: {arm_input}\n")
                     # arm_input = [2, 0, 0, 2, 0, 0, 2, 0, 0]
                     # mod_cmds = 
                     # Robot.send_torque(arm_input, mod_cmds)

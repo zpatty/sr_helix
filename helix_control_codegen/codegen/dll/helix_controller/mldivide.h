@@ -5,7 +5,7 @@
  * File: mldivide.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 20:27:52
+ * C/C++ source code generated on  : 28-Oct-2024 23:07:32
  */
 
 #ifndef MLDIVIDE_H
@@ -21,6 +21,8 @@ extern "C" {
 #endif
 
 /* Function Declarations */
+void b_mldivide(const double A[100], double B[30]);
+
 void mldivide(const double A[100], double B[10]);
 
 #ifdef __cplusplus

@@ -17,7 +17,10 @@ function [M, C] = MC_3_cg(q,qd,m,r,L0,d)
 % N = number of links (number of modules plus number of motors)
 N=4;
 a_grav = [0;0;9.81/2;0;0;0];
-
+% for i=1:N-1
+%     q(i*3+1) = -q(i*3+1);
+%     qd(i*3+1) = -qd(i*3+1);
+% end
 % qi = {1, 2:4, 5, 6:8, 9, 10:12, 13, 14:16};
 Nq = 1 + (N-1)*3;
 I = zeros(6,6,N);

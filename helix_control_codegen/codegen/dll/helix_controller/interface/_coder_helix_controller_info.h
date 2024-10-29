@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_info.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 20:27:52
+ * C/C++ source code generated on  : 28-Oct-2024 23:07:32
  */
 
 #ifndef _CODER_HELIX_CONTROLLER_INFO_H

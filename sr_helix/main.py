@@ -90,6 +90,9 @@ class HelicoidRobot():
         self.update_cable_lens()
 
     def update_cable_lens(self):
+        """
+        updates cable lengths of dynamixels
+        """
         pos = self.Arm.get_position()
         self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
 
@@ -107,23 +110,20 @@ class HelicoidRobot():
         l2 = self.l[1]      # m4, m5, m6
         l3 = self.l[2]      # m7, m8, m9
         # OG
-        # m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
-        # m2 = [l1[1], l2[1], l3[1]]  #
-        # m3 = [l1[0], l2[0], l3[0]]
+        m1 = [l1[2], l2[2], l3[2]]  # mod 1 cable lengths [3, 6, 9]
+        m2 = [l1[1], l2[1], l3[1]]  # mod 2 cable lengths [2, 5, 8]
+        m3 = [l1[0], l2[0], l3[0]]  # mod 3 cable lengths [1, 4, 7]
 
-        # zach
-        m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
-        m2 = [l1[1], l3[1], l2[1]]  # m2, m8, m5
-        m3 = [l2[0], l3[0], l1[0]]  # m4, m7, m1
-        print(f"m1: {m1}")  
-        print(f"m2: {m2}")
-        print(f"m3: {m3}")
+        # print(f"m1: {m1}")  
+        # print(f"m2: {m2}")
+        # print(f"m3: {m3}")
         q = grab_helix_q(m1, m2, m3, mj, self.s, self.d)
-        # q = grab_helix_q(l1, l2, l3, mj, self.s, d)
+
         return q
 
     def send_torque(self, arm_tau, mod_tau):
-        joint_cmds = [arm_tau[0]]
+        # joint_cmds = [arm_tau[0]]
+        joint_cmds = [0]
         m1 = mod_tau[:3]
         m2 = mod_tau[3:6]
         m3 = mod_tau[6:]
@@ -198,9 +198,22 @@ def main():
             print(f"[STATUS] MOD 1 cable len: {[l1[2], l2[2], l3[2]]}")
             print(f"[STATUS] MOD 2 cable len: {[l1[1], l2[1], l3[1]]}")
             print(f"[STATUS] MOD 3 cable len: {[l1[0], l2[0], l3[0]]}")
-
             q = Robot.grab_q()
             print(f"[STATUS] current q: {q}")
+            dx1 = q[1]
+            dy1 = q[2]
+            dL1 = q[3]
+
+            dx2 = q[4]
+            dy2 = q[5]
+            dL2 = q[6]
+
+            dx3 = q[7]
+            dy3 = q[8]
+            dL3 = q[9]
+            print(f"[STATUS] dx: {dx3}")
+            print(f"[STATUS] dy: {dy3}")
+            print(f"[STATUS] dL: {dL3}")
         elif key_input == chr(PKEY_ASCII_VALUE):
             """
             Position control mode --- set "cable lengths"
@@ -227,6 +240,10 @@ def main():
             Set Arm to specific configuration
             """
             print(f"-------------- CONTROLLER MODE---------------------\n")
+            Robot.Arm.set_current_cntrl_mode()
+            Robot.Arm.enable_torque()
+            Robot.Joint.set_current_cntrl_mode()
+
             helix_controller = load_helix_controller()
             qd_str = parse_setpoint()
             qd = grab_helix_qd(qd_str, Robot.d)
@@ -260,6 +277,8 @@ def main():
                     print(f"------------------------ outputs --------------------\n")
                     print(f"[OUTPUT] Our desired config: {qd}\n")
                     print(f"[OUTPUT] Our last recorded q: {q}\n")
+                    err = q - qd
+                    print(f"[OUTPUT] Our last recorded error: {err}\n")
                     print(f"[OUTPUT] Our last recorded c: {cont}\n")
                     print(f"max dt value: {np.max(dt_loop)}\n")
                     print(f"last time: {timestamps[-1]}\n")
@@ -274,7 +293,7 @@ def main():
                         q = Robot.grab_q()
                     except:
                         q = q_old
-                    # print(f"[DEBUG] q: {q}")
+                    print(f"[DEBUG] q: {q}")
                     if first_time:
                         first_time = False
                         dq = np.zeros((10,1))
@@ -295,19 +314,31 @@ def main():
                     err = q - qd
                     err_dot = dq
                     print(f"err: {err}\n")
-                    tau, cont = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
-                    print(f"[DEBUG] tau: {tau}\n")
+                    tau, cont, A = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
+                    A = A.reshape((10,10),order = 'F')    
+                    # tau = np.zeros((10,1))
+                    # tau = np.linalg.inv(A) @ tau
+                    # tau[5] = 3
+                    force_tau = A.dot(tau)
+                    print(f"forces tau: {force_tau}")
+                    # print(f"tau size: {tau.size}")
                     c_data = np.append(c_data, cont, axis=1) 
-
-                    arm_input, mod_cmds = torque_to_current(tau,Robot.l)
+                    # tau= [m0, m3, m6, m9, m2, m8, m5, m4, m7, m1]
+                    a_tau = np.array([tau[0], 
+                                      tau[9], tau[4], tau[1],
+                                      tau[7], tau[6], tau[2],
+                                      tau[8], tau[5], tau[3]])
+                    print(f"[DEBUG] tau: {tau}\n")
+                    print(f"realigned motors: {a_tau}")
+                    arm_input, mod_cmds = torque_to_current(a_tau,Robot.l)
                     input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
                     tau_data=np.append(tau_data, tau, axis=1) 
 
                     print(f"[DEBUG] mod cmds: {mod_cmds}\n")
-
                     print(f"[DEBUG] arm input: {arm_input}\n")
-                    # arm_input = [2, 0, 0, 2, 0, 0, 2, 0, 0]
-                    # mod_cmds = 
+                    print(f"[DEBUG] joint input: {arm_input[0]}\n")
+
+                    # mod_cmds = arm_input
                     Robot.send_torque(arm_input, mod_cmds)
                     
 

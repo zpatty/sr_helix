@@ -20,9 +20,9 @@ def load_helix_controller():
     helix_controller = ctrl.helix_controller
     helix_controller.restype = None
     helix_controller.argtypes = np_mat_type(10), np_mat_type(10), np_mat_type(10), np_mat_type(10), np_mat_type(10),\
-    c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_double,\
+    c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_double,\
     np_mat_type(100), np_mat_type(100), c_double, c_double, np_mat_type(3), np_mat_type(3), np_mat_type(3),\
-    c_double, c_double, np_mat_type(10), np_mat_type(10), np_mat_type(36), np_mat_type(100), np_mat_type(10), \
+    c_double, c_double, np_mat_type(10), np_mat_type(10), np_mat_type(3), np_mat_type(100), np_mat_type(10), \
     np_mat_type(100), np_mat_type(3)
     
     return helix_controller
@@ -135,14 +135,14 @@ def helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,d,r,param,helix_control
     KDvec = np.reshape(KD.astype(float),(100,1))
     tau = np.zeros((10,1))
     tau_r = np.zeros((10,1))
-    x = np.zeros((36,1))
+    x = np.zeros((3,1))
     cont = np.zeros((4,1))
     A = np.zeros((100,1))
     M = np.zeros((100,1))
     C = np.zeros((10,1))
     cq = np.zeros((3,1))
     N = 4
-    helix_controller(np.squeeze(q), np.squeeze(dq), np.squeeze(qd),  np.squeeze(zero), np.squeeze(zero), N, d, m, \
+    helix_controller(np.squeeze(q), np.squeeze(dq), np.squeeze(qd),  np.squeeze(zero), np.squeeze(zero), d, m, \
                         r, kb, ks, bb, bs, bm, L0, np.squeeze(Kpvec), np.squeeze(KDvec), Kpx, KDx, np.squeeze(xd), np.squeeze(dxd), np.squeeze(dxr), conv_pcc, conv_motor, \
                         np.squeeze(tau), np.squeeze(tau_r), np.squeeze(x), np.squeeze(M), np.squeeze(C), np.squeeze(A), np.squeeze(cq))
     return tau, cont

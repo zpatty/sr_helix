@@ -90,6 +90,9 @@ class HelicoidRobot():
         self.update_cable_lens()
 
     def update_cable_lens(self):
+        """
+        updates cable lengths of dynamixels
+        """
         pos = self.Arm.get_position()
         self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
 
@@ -107,19 +110,15 @@ class HelicoidRobot():
         l2 = self.l[1]      # m4, m5, m6
         l3 = self.l[2]      # m7, m8, m9
         # OG
-        # m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
-        # m2 = [l1[1], l2[1], l3[1]]  #
-        # m3 = [l1[0], l2[0], l3[0]]
+        m1 = [l1[2], l2[2], l3[2]]  # mod 1 cable lengths [3, 6, 9]
+        m2 = [l1[1], l2[1], l3[1]]  # mod 2 cable lengths [2, 5, 8]
+        m3 = [l1[0], l2[0], l3[0]]  # mod 3 cable lengths [1, 4, 7]
 
-        # zach
-        m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
-        m2 = [l1[1], l3[1], l2[1]]  # m2, m8, m5
-        m3 = [l2[0], l3[0], l1[0]]  # m4, m7, m1
         print(f"m1: {m1}")  
         print(f"m2: {m2}")
         print(f"m3: {m3}")
         q = grab_helix_q(m1, m2, m3, mj, self.s, self.d)
-        # q = grab_helix_q(l1, l2, l3, mj, self.s, d)
+
         return q
 
     def send_torque(self, arm_tau, mod_tau):
@@ -198,9 +197,22 @@ def main():
             print(f"[STATUS] MOD 1 cable len: {[l1[2], l2[2], l3[2]]}")
             print(f"[STATUS] MOD 2 cable len: {[l1[1], l2[1], l3[1]]}")
             print(f"[STATUS] MOD 3 cable len: {[l1[0], l2[0], l3[0]]}")
-
             q = Robot.grab_q()
             print(f"[STATUS] current q: {q}")
+            dx1 = q[1]
+            dy1 = q[2]
+            dL1 = q[3]
+
+            dx2 = q[4]
+            dy2 = q[5]
+            dL2 = q[6]
+
+            dx3 = q[7]
+            dy3 = q[8]
+            dL3 = q[9]
+            print(f"[STATUS] dx: {dx3}")
+            print(f"[STATUS] dy: {dy3}")
+            print(f"[STATUS] dL: {dL3}")
         elif key_input == chr(PKEY_ASCII_VALUE):
             """
             Position control mode --- set "cable lengths"

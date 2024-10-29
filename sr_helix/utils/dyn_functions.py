@@ -173,24 +173,24 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     @q:  generalized coordinates [dx, dy, dL]
     """
     # need to flip direction for mod 1 and mod 3
-    Lm = 0.0001
+    Lm = 0.001
     l1_1 = l1[0]
     l1_2 = l1[1]
     l1_3 = l1[2]
-    phi1 = math.atan2(((math.sqrt(3)/3) * (l1_3 + l1_2 - 2 * l1_1)),(l1_2 - l1_3)) 
-    k1 = 2 * math.sqrt(l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3))/(d* (l1_1 + l1_2 + l1_3+ 3 * Lm))
+    phi1 = math.atan2(((math.sqrt(3)/3) * (l1_3 + l1_2 - 2 * l1_1)),(l1_2 - l1_3)) + np.pi
+    k1 = 2 * math.sqrt(l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3))/(d* (l1_1 + l1_2 + l1_3))
     
     l2_1 = l2[0]
     l2_2 = l2[2]
     l2_3 = l2[1]
-    phi2 = math.atan2(((math.sqrt(3)/3) * (l2_3 + l2_2 - 2 * l2_1)),(l2_2 - l2_3)) + np.pi
-    k2 = 2 * math.sqrt(l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3))/(d* (l2_1 + l2_2 + l2_3+ 3 * Lm))
+    phi2 = math.atan2(((math.sqrt(3)/3) * (l2_3 + l2_2 - 2 * l2_1)),(l2_2 - l2_3))
+    k2 = 2 * math.sqrt(l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3))/(d* (l2_1 + l2_2 + l2_3))
     
     l3_1 = l3[1]
     l3_2 = l3[2]
     l3_3 = l3[0]
-    phi3 = math.atan2(((math.sqrt(3)/3) * (l3_3 + l3_2 - 2 * l3_1)),(l3_2 - l3_3))
-    k3 = 2 * math.sqrt(l3_1**2 + l3_2**2 + l3_3**2 - (l3_1*l3_2) - (l3_2 * l3_3) - (l3_1*l3_3))/(d* (l3_1 + l3_2 + l3_3+ 3 * Lm))
+    phi3 = math.atan2(((math.sqrt(3)/3) * (l3_3 + l3_2 - 2 * l3_1)),(l3_2 - l3_3)) + np.pi
+    k3 = 2 * math.sqrt(l3_1**2 + l3_2**2 + l3_3**2 - (l3_1*l3_2) - (l3_2 * l3_3) - (l3_1*l3_3))/(d* (l3_1 + l3_2 + l3_3))
 
     s_curr1 = (l1_1 + l1_2 + l1_3)/3
     s_curr2 = (l2_1 + l2_2 + l2_3)/3
@@ -207,7 +207,7 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     dL3 = s_curr3 - s 
     dx3 = k3 * s_curr3 * d * cos(phi3)
     dy3 = k3 * s_curr3 * d * sin(phi3)
-
+    print(f"k1, k2, k3: {[k1, k2, k3]}")
     q = np.array([mj0, dx1, dy1, dL1, dx2, dy2, dL2, dx3, dy3, dL3]).reshape(-1,1)
     return q
 

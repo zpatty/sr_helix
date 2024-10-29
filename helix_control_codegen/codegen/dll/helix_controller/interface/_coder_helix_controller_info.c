@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_info.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 23:07:32
+ * C/C++ source code generated on  : 28-Oct-2024 23:34:49
  */
 
 /* Include Files */
@@ -91,7 +91,7 @@ mxArray *emlrtMexFcnProperties(void)
       emlrtMxCreateString("/home/zach/git-repos/sr_helix/helix_control_codegen/"
                           "helix_controller.m"));
   emlrtSetField(xEntryPoints, 0, "TimeStamp",
-                emlrtMxCreateDoubleScalar(739553.961550926));
+                emlrtMxCreateDoubleScalar(739553.98140046292));
   emlrtSetField(xEntryPoints, 0, "Constructor",
                 emlrtMxCreateLogicalScalar(false));
   emlrtSetField(xEntryPoints, 0, "Visible", emlrtMxCreateLogicalScalar(true));

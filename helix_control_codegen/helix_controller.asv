@@ -1,12 +1,12 @@
-function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,N,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
+function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
 
-
+N = 4;
 qp = zeros(3,N-1);
-for i=1:N
+for i=1:N-1
     qp(:,i) = q(2 + 3*(i-1):4 + 3*(i-1));
 end
 
-[M, C] = MC_3_cg(q,dq,m,r,L0,d, N);
+[M, C] = MC_3_cg(q,dq,m,r,L0,d);
 
 K = diag([0; repmat([kb;kb;ks],N-1,1)]);
 D = diag([bm; repmat([bb;bb;bs],N-1,1)]);
@@ -15,7 +15,7 @@ D = diag([bm; repmat([bb;bb;bs],N-1,1)]);
 % Ai = cell(1,4);
 Ai = zeros(3,3,N-1);
 cq = zeros(N-1,1);
-for i = 1:length(qp)
+for i = 1:N-1
     dx = qp(1,i);
     dy = qp(2,i);
     dL = qp(3,i);
@@ -38,18 +38,23 @@ for i = 1:length(qp)
     end
     cq(i) = c;
 
-    Al = [d*cosd(60) d*cosd(60) -d;
+    Al = [cosd(-60) -sind(-60) 0; sind(60) cosd(60) 0; 0 0 1]*[d*cosd(60) d*cosd(60) -d;
     -d*cosd(30) d*cosd(30) 0;
     1 1 1];
-
+    if i == 2
+        Al = [cosd(90) -sind(90) 0; sind(90) cosd(90) 0; 0 0 1]*Al;
+    % else
+    %     Al = [-d d*cosd(30) d*cosd(30); 0 d*sind(30) -d*sind(30); 1 1 1];
+    end
     At = [1,0,0;0,1,0;0,0,1]*-1;
     Ai(:,:,i) = Aq * At * Al;
 end
-A = blkdiag(1,Ai(:,:,1),Ai(:,:,2),Ai(:,:,3));
+% A = blkdiag(1,Ai(:,:,1),Ai(:,:,2),Ai(:,:,3));
 A = zeros(1 + (N-1)*3, 1 + (N-1)*3);
 A(1,1) = 1;
 for i=1:N-1
-    A
+    A(2 + 3*(i-1):4 + 3*(i-1),2 + 3*(i-1):4 + 3*(i-1)) = Ai(:,:,i);
+end
 
 conversion = diag([conv_motor, repmat([conv_pcc, conv_pcc, conv_pcc],1,N-1)]);
 tau = conversion*(A\(C + M*ddqd + K*qd + D*dqd + Kp*(qd-q) + KD*(dqd - dq)));

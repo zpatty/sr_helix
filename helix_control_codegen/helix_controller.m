@@ -38,13 +38,13 @@ for i = 1:N-1
     end
     cq(i) = c;
 
-    % Al = [d*cosd(60) d*cosd(60) -d;
-    % -d*cosd(30) d*cosd(30) 0;
-    % 1 1 1];
+    Al = [cosd(60) -sind(60) 0; sind(60) cosd(60) 0; 0 0 1]*[d*cosd(60) d*cosd(60) -d;
+    -d*cosd(30) d*cosd(30) 0;
+    1 1 1];
     if i == 2
-        Al = [cosd(90) -sind(90) 0; sind(90) cosd(90) 0; 0 0 1]*[-d d*cosd(30) d*cosd(30); 0 d*sind(30) -d*sind(30); 1 1 1];
-    else
-        Al = [-d d*cosd(30) d*cosd(30); 0 d*sind(30) -d*sind(30); 1 1 1];
+        Al = [cosd(90) -sind(90) 0; sind(90) cosd(90) 0; 0 0 1]*Al;
+    % else
+    %     Al = [-d d*cosd(30) d*cosd(30); 0 d*sind(30) -d*sind(30); 1 1 1];
     end
     At = [1,0,0;0,1,0;0,0,1]*-1;
     Ai(:,:,i) = Aq * At * Al;

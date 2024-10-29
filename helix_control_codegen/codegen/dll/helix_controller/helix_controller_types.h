@@ -5,7 +5,7 @@
  * File: helix_controller_types.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 20:27:52
+ * C/C++ source code generated on  : 28-Oct-2024 23:07:32
  */
 
 #ifndef HELIX_CONTROLLER_TYPES_H

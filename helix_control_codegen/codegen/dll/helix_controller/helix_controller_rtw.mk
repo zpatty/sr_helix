@@ -2,7 +2,7 @@
 ## Makefile generated for component 'helix_controller'. 
 ## 
 ## Makefile     : helix_controller_rtw.mk
-## Generated on : Mon Oct 28 20:28:33 2024
+## Generated on : Mon Oct 28 23:08:13 2024
 ## Final product: ./helix_controller.so
 ## Product type : dynamic-library
 ## 
@@ -167,7 +167,7 @@ DEFINES = $(DEFINES_CUSTOM) $(DEFINES_STANDARD)
 ## SOURCE FILES
 ###########################################################################
 
-SRCS = $(START_DIR)/codegen/dll/helix_controller/rt_nonfinite.c $(START_DIR)/codegen/dll/helix_controller/rtGetNaN.c $(START_DIR)/codegen/dll/helix_controller/rtGetInf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_initialize.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_terminate.c $(START_DIR)/codegen/dll/helix_controller/helix_controller.c $(START_DIR)/codegen/dll/helix_controller/MC_3_cg.c $(START_DIR)/codegen/dll/helix_controller/J_r.c $(START_DIR)/codegen/dll/helix_controller/mldivide.c $(START_DIR)/codegen/dll/helix_controller/xgetrf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_rtwutil.c
+SRCS = $(START_DIR)/codegen/dll/helix_controller/rt_nonfinite.c $(START_DIR)/codegen/dll/helix_controller/rtGetNaN.c $(START_DIR)/codegen/dll/helix_controller/rtGetInf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_initialize.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_terminate.c $(START_DIR)/codegen/dll/helix_controller/helix_controller.c $(START_DIR)/codegen/dll/helix_controller/repmat.c $(START_DIR)/codegen/dll/helix_controller/J_r.c $(START_DIR)/codegen/dll/helix_controller/mrdivide_helper.c $(START_DIR)/codegen/dll/helix_controller/mtimes.c $(START_DIR)/codegen/dll/helix_controller/mldivide.c $(START_DIR)/codegen/dll/helix_controller/xgetrf.c $(START_DIR)/codegen/dll/helix_controller/helix_controller_rtwutil.c
 
 ALL_SRCS = $(SRCS)
 
@@ -175,7 +175,7 @@ ALL_SRCS = $(SRCS)
 ## OBJECTS
 ###########################################################################
 
-OBJS = rt_nonfinite.o rtGetNaN.o rtGetInf.o helix_controller_initialize.o helix_controller_terminate.o helix_controller.o MC_3_cg.o J_r.o mldivide.o xgetrf.o helix_controller_rtwutil.o
+OBJS = rt_nonfinite.o rtGetNaN.o rtGetInf.o helix_controller_initialize.o helix_controller_terminate.o helix_controller.o repmat.o J_r.o mrdivide_helper.o mtimes.o mldivide.o xgetrf.o helix_controller_rtwutil.o
 
 ALL_OBJS = $(OBJS)
 
@@ -402,11 +402,19 @@ helix_controller.o : $(START_DIR)/codegen/dll/helix_controller/helix_controller.
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
-MC_3_cg.o : $(START_DIR)/codegen/dll/helix_controller/MC_3_cg.c
+repmat.o : $(START_DIR)/codegen/dll/helix_controller/repmat.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 
 J_r.o : $(START_DIR)/codegen/dll/helix_controller/J_r.c
+	$(CC) $(CFLAGS) -o "$@" "$<"
+
+
+mrdivide_helper.o : $(START_DIR)/codegen/dll/helix_controller/mrdivide_helper.c
+	$(CC) $(CFLAGS) -o "$@" "$<"
+
+
+mtimes.o : $(START_DIR)/codegen/dll/helix_controller/mtimes.c
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
 

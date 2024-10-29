@@ -313,7 +313,7 @@ for j = 1:length(Dv)
     % A = pi*(rm)^2;
     y = 1/12 * (Lo) .^3 ./ I / E * cosd(alpha)^2;  %needs * 4/3, 2 from other side
     kbD(j) = kD(j)*If/A*r/ri/2;
-    kbD(j) = kD(j)*If/H*115;
+    kbD(j) = kD(j)*If/H*91;
 end
 
 Hv = linspace(0.05,0.2);

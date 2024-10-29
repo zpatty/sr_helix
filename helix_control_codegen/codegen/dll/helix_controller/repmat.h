@@ -2,14 +2,14 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: MC_3_cg.h
+ * File: repmat.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 20:27:52
+ * C/C++ source code generated on  : 28-Oct-2024 23:07:32
  */
 
-#ifndef MC_3_CG_H
-#define MC_3_CG_H
+#ifndef REPMAT_H
+#define REPMAT_H
 
 /* Include Files */
 #include "rtwtypes.h"
@@ -21,8 +21,7 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void MC_3_cg(const double q[10], const double qd[10], double m, double r,
-             double L0, double M[100], double C[10]);
+void repmat(const double a[3], double b[9]);
 
 #ifdef __cplusplus
 }
@@ -30,7 +29,7 @@ void MC_3_cg(const double q[10], const double qd[10], double m, double r,
 
 #endif
 /*
- * File trailer for MC_3_cg.h
+ * File trailer for repmat.h
  *
  * [EOF]
  */

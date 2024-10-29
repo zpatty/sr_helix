@@ -45,12 +45,12 @@ Rz = @(x) [cos(x), -sin(x), 0;
 % syms del
 g = {};
 g{1} = [Rz(th), [0; 0; 0]; 0 0 0 1];
-g12 = gpcc(qp1(1),qp1(2),qp1(3),L0,d);
-g23 = gpcc(qp2(1),qp2(2),qp2(3),L0,d);
-g3e = gpcc(qp3(1),qp3(2),qp3(3),L0,d);
-g{2} = simplify(g{1}*gpcc(qp1(1),qp1(2),qp1(3),L0/2,d));
-g{3} = simplify(g{1}*g12*gpcc(qp2(1),qp2(2),qp2(3),L0/2,d));
-g{4} = simplify(g{1}*g12*g23*gpcc(qp3(1),qp3(2),qp3(3),L0/2,d));
+g12 = gpcc(qp1(1),qp1(2),qp1(3),-L0,d);
+g23 = gpcc(qp2(1),qp2(2),qp2(3),-L0,d);
+g3e = gpcc(qp3(1),qp3(2),qp3(3),-L0,d);
+g{2} = simplify(g{1}*gpcc(qp1(1),qp1(2),qp1(3),-L0/2,d));
+g{3} = simplify(g{1}*g12*gpcc(qp2(1),qp2(2),qp2(3),-L0/2,d));
+g{4} = simplify(g{1}*g12*g23*gpcc(qp3(1),qp3(2),qp3(3),-L0/2,d));
 g_ee = simplify(g{1}*g12*g23*g3e*[eye(3) Rz(0)*[0.0; 0; 0]; 0 0 0 1]);
 
 % gc = sym(zeros(6,1));

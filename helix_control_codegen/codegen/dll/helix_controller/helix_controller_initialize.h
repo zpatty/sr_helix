@@ -5,7 +5,7 @@
  * File: helix_controller_initialize.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
 #ifndef HELIX_CONTROLLER_INITIALIZE_H

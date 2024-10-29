@@ -1,12 +1,12 @@
-function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,N,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
+function [tau, tau_r, x, M, C, A, cq] = helix_controller(q,dq,qd,dqd,ddqd,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor) %#codegen
 
-
+N = 4;
 qp = zeros(3,N-1);
 for i=1:N-1
     qp(:,i) = q(2 + 3*(i-1):4 + 3*(i-1));
 end
 
-[M, C, J, x] = MC_3_cg(q,dq,m,r,L0,d, N);
+[M, C] = MC_3_cg(q,dq,m,r,L0,d);
 
 K = diag([0; repmat([kb;kb;ks],N-1,1)]);
 D = diag([bm; repmat([bb;bb;bs],N-1,1)]);
@@ -59,11 +59,9 @@ Kpr = Kp;
 Kpr(1,1) = 0;
 KDr = KD;
 KDr(1,1) = 0;
-% [J, x] = J_r(q,L0,d);
-J = J(1:3,:);
+[J, x] = J_r(q,L0,d);
 Lam = eye(3)/(J * (M \ J'));
 Jbar = M \ J' * Lam;
-tau_r = 0;
-% tau_r = conversion*(A\(C + J'*Jbar'*(K*q + D*dq) + J'*Lam*(Kpx*(xd-x) + KDx*(dxd - dxr))) + (eye(10) - J'*Jbar')*(-Kpr * q - KDr * dq));
+tau_r = conversion*(A\(C + J'*Jbar'*(K*q + D*dq) + J'*Lam*(Kpx*(xd-x) + KDx*(dxd - dxr))) + (eye(10) - J'*Jbar')*(-Kpr * q - KDr * dq));
 end
 

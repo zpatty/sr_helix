@@ -3,7 +3,7 @@
 % given the current state and geometric parameters of the pushpuppet robot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [M, C, J, X] = MC_3_cg(q,qd,m,r,L0,d,N)
+function [M, C] = MC_3_cg(q,qd,m,r,L0,d)
 % q = state
 % qd = velocity
 % qdd = acceleration
@@ -15,7 +15,7 @@ function [M, C, J, X] = MC_3_cg(q,qd,m,r,L0,d,N)
 % L0 = Length of a module;
 % d = distance to cable;
 % N = number of links (number of modules plus number of motors)
-
+N=4;
 a_grav = [0;0;9.81/2;0;0;0];
 
 % qi = {1, 2:4, 5, 6:8, 9, 10:12, 13, 14:16};

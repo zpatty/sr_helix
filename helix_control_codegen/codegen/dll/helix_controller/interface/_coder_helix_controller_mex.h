@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_mex.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
 #ifndef _CODER_HELIX_CONTROLLER_MEX_H
@@ -27,7 +27,7 @@ MEXFUNCTION_LINKAGE void mexFunction(int32_T nlhs, mxArray *plhs[],
 emlrtCTX mexFunctionCreateRootTLS(void);
 
 void unsafe_helix_controller_mexFunction(int32_T nlhs, mxArray *plhs[7],
-                                         int32_T nrhs, const mxArray *prhs[24]);
+                                         int32_T nrhs, const mxArray *prhs[23]);
 
 #ifdef __cplusplus
 }

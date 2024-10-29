@@ -2,17 +2,16 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: xgeqp3.h
+ * File: J_r.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
-#ifndef XGEQP3_H
-#define XGEQP3_H
+#ifndef J_R_H
+#define J_R_H
 
 /* Include Files */
-#include "helix_controller_types.h"
 #include "rtwtypes.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -22,7 +21,7 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void xgeqp3(emxArray_real_T *A, emxArray_real_T *tau, emxArray_int32_T *jpvt);
+void J_r(double q[10], double L0, double d, double Jr[30], double x_r[3]);
 
 #ifdef __cplusplus
 }
@@ -30,7 +29,7 @@ void xgeqp3(emxArray_real_T *A, emxArray_real_T *tau, emxArray_int32_T *jpvt);
 
 #endif
 /*
- * File trailer for xgeqp3.h
+ * File trailer for J_r.h
  *
  * [EOF]
  */

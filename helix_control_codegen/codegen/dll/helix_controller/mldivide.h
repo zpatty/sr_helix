@@ -2,14 +2,14 @@
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
- * File: cosd.h
+ * File: mldivide.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
-#ifndef COSD_H
-#define COSD_H
+#ifndef MLDIVIDE_H
+#define MLDIVIDE_H
 
 /* Include Files */
 #include "rtwtypes.h"
@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 /* Function Declarations */
-void b_cosd(double *x);
+void mldivide(const double A[100], double B[10]);
 
 #ifdef __cplusplus
 }
@@ -29,7 +29,7 @@ void b_cosd(double *x);
 
 #endif
 /*
- * File trailer for cosd.h
+ * File trailer for mldivide.h
  *
  * [EOF]
  */

@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_api.h
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
 #ifndef _CODER_HELIX_CONTROLLER_API_H
@@ -17,22 +17,6 @@
 #include "tmwtypes.h"
 #include <string.h>
 
-/* Type Definitions */
-#ifndef struct_emxArray_real_T
-#define struct_emxArray_real_T
-struct emxArray_real_T {
-  real_T *data;
-  int32_T *size;
-  int32_T allocatedSize;
-  int32_T numDimensions;
-  boolean_T canFreeData;
-};
-#endif /* struct_emxArray_real_T */
-#ifndef typedef_emxArray_real_T
-#define typedef_emxArray_real_T
-typedef struct emxArray_real_T emxArray_real_T;
-#endif /* typedef_emxArray_real_T */
-
 /* Variable Declarations */
 extern emlrtCTX emlrtRootTLSGlobal;
 extern emlrtContext emlrtContextGlobal;
@@ -43,16 +27,15 @@ extern "C" {
 
 /* Function Declarations */
 void helix_controller(real_T q[10], real_T dq[10], real_T qd[10],
-                      real_T dqd[10], real_T ddqd[10], real_T N, real_T d,
-                      real_T m, real_T r, real_T kb, real_T ks, real_T bb,
-                      real_T bs, real_T bm, real_T L0, real_T Kp[100],
-                      real_T KD[100], real_T Kpx, real_T KDx, real_T xd[3],
-                      real_T dxd[3], real_T dxr[3], real_T conv_pcc,
-                      real_T conv_motor, emxArray_real_T *tau, real_T *tau_r,
-                      real_T x[36], emxArray_real_T *M, emxArray_real_T *C,
-                      emxArray_real_T *A, emxArray_real_T *cq);
+                      real_T dqd[10], real_T ddqd[10], real_T d, real_T m,
+                      real_T r, real_T kb, real_T ks, real_T bb, real_T bs,
+                      real_T bm, real_T L0, real_T Kp[100], real_T KD[100],
+                      real_T Kpx, real_T KDx, real_T xd[3], real_T dxd[3],
+                      real_T dxr[3], real_T conv_pcc, real_T conv_motor,
+                      real_T tau[10], real_T tau_r[10], real_T x[3],
+                      real_T M[100], real_T C[10], real_T A[100], real_T cq[3]);
 
-void helix_controller_api(const mxArray *const prhs[24], int32_T nlhs,
+void helix_controller_api(const mxArray *const prhs[23], int32_T nlhs,
                           const mxArray *plhs[7]);
 
 void helix_controller_atexit(void);

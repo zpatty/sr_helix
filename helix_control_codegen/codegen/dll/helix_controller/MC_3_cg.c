@@ -5,15 +5,12 @@
  * File: MC_3_cg.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
 /* Include Files */
 #include "MC_3_cg.h"
-#include "PCC_jacobian.h"
-#include "helix_controller_emxutil.h"
-#include "helix_controller_types.h"
-#include "rt_nonfinite.h"
+#include "helix_controller_rtwutil.h"
 #include "rt_nonfinite.h"
 #include <math.h>
 #include <string.h>
@@ -37,16 +34,12 @@
  *                double m
  *                double r
  *                double L0
- *                double N
- *                emxArray_real_T *M
- *                emxArray_real_T *C
- *                emxArray_real_T *J
- *                double X[36]
+ *                double M[100]
+ *                double C[10]
  * Return Type  : void
  */
 void MC_3_cg(const double q[10], const double qd[10], double m, double r,
-             double L0, double N, emxArray_real_T *M, emxArray_real_T *C,
-             emxArray_real_T *J, double X[36])
+             double L0, double M[100], double C[10])
 {
   static const double b_b[6] = {-0.0, -0.0, -4.905, -0.0, -0.0, -0.0};
   static const double v[6] = {0.738,
@@ -58,84 +51,55 @@ void MC_3_cg(const double q[10], const double qd[10], double m, double r,
   static const signed char b[36] = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
                                     0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                                     0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
-  static const signed char b_a[6] = {0, 0, 0, 0, 0, 1};
-  static const signed char c_a[6] = {0, 0, 0, 0, 0, 2};
-  static const signed char iv1[6] = {0, 0, 0, 0, 0, 1};
-  emxArray_int32_T *b_r;
-  emxArray_int32_T *r1;
-  emxArray_real_T *Smod;
-  emxArray_real_T *XJ;
-  emxArray_real_T *Xup;
-  emxArray_real_T *a;
-  emxArray_real_T *b_I;
-  emxArray_real_T *b_q;
-  emxArray_real_T *b_qd;
-  emxArray_real_T *b_v;
-  emxArray_real_T *f;
-  emxArray_real_T *qi;
+  static const signed char c_a[6] = {0, 0, 0, 0, 0, 1};
+  static const signed char d_a[6] = {0, 0, 0, 0, 0, 2};
+  static const signed char iv[6] = {0, 0, 0, 0, 0, 1};
+  double XJ[144];
+  double Xup[144];
+  double b_I[144];
+  double Smod[54];
   double I_tmp[36];
   double b_I_tmp[36];
+  double a[24];
+  double b_v[24];
+  double f[24];
   double c_Xup[18];
   double fh3[18];
   double g[16];
   double b_skw[9];
   double c_skw[9];
+  double dv[9];
   double skw[9];
   double c_I[6];
   double vJ[6];
-  double c_qd[3];
-  double Nq_tmp;
-  double d;
-  double d1;
+  double b_qd[3];
+  double a_tmp;
+  double b_a;
+  double b_g_tmp;
+  double g_tmp;
+  double g_tmp_tmp;
   double vJ_tmp;
   double vJ_tmp_tmp;
-  double *C_data;
-  double *I_data;
-  double *J_data;
-  double *Smod_data;
-  double *XJ_data;
-  double *Xup_data;
-  double *a_data;
-  double *f_data;
-  double *q_data;
-  double *qd_data;
-  double *qi_data;
-  double *v_data;
+  int XJ_tmp;
+  int b_XJ_tmp;
   int b_i;
+  int c_XJ_tmp;
   int i;
   int i1;
-  int i2;
-  int i3;
   int j;
-  int loop_ub_tmp;
-  int *r2;
-  int *r3;
   signed char Xtree[36];
-  signed char iv[9];
+  signed char qi_data[9];
+  signed char tmp_data[9];
   /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
   /*  This function calculates the Mass and Coriolis + Gravity Matrices */
   /*  given the current state and geometric parameters of the pushpuppet robot
    */
   /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
   /*  qi = {1, 2:4, 5, 6:8, 9, 10:12, 13, 14:16}; */
-  Nq_tmp = (N - 1.0) * 3.0 + 1.0;
-  emxInit_real_T(&b_I, 3);
-  i = b_I->size[0] * b_I->size[1] * b_I->size[2];
-  b_I->size[0] = 6;
-  b_I->size[1] = 6;
-  i1 = (int)N;
-  b_I->size[2] = (int)N;
-  emxEnsureCapacity_real_T(b_I, i);
-  I_data = b_I->data;
-  loop_ub_tmp = 36 * (int)N;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    I_data[i] = 0.0;
-  }
-  for (i = 0; i < 36; i++) {
-    I_data[i] = 0.0;
-  }
+  memset(&b_I[0], 0, 144U * sizeof(double));
+  memset(&b_I[0], 0, 36U * sizeof(double));
   for (j = 0; j < 6; j++) {
-    I_data[j + 6 * j] = v[j];
+    b_I[j + 6 * j] = v[j];
   }
   vJ[0] = m;
   vJ[1] = m;
@@ -149,104 +113,28 @@ void MC_3_cg(const double q[10], const double qd[10], double m, double r,
   for (j = 0; j < 6; j++) {
     I_tmp[j + 6 * j] = vJ[j];
   }
-  for (i = 0; i < 36; i++) {
-    I_data[i + 36] = I_tmp[i];
+  memcpy(&b_I[36], &I_tmp[0], 36U * sizeof(double));
+  for (i = 0; i < 2; i++) {
+    memcpy(&b_I[i * 36 + 72], &I_tmp[0], 36U * sizeof(double));
   }
-  i = (int)(N - 2.0);
-  for (b_i = 0; b_i < i; b_i++) {
-    for (i2 = 0; i2 < 36; i2++) {
-      I_data[(i2 + b_i * 36) + 72] = I_tmp[i2];
-    }
-  }
-  emxInit_real_T(&Smod, 3);
-  i = Smod->size[0] * Smod->size[1] * Smod->size[2];
-  Smod->size[0] = 6;
-  Smod->size[1] = 3;
-  i2 = (int)(N - 1.0);
-  Smod->size[2] = (int)(N - 1.0);
-  emxEnsureCapacity_real_T(Smod, i);
-  Smod_data = Smod->data;
-  j = 18 * (int)(N - 1.0);
-  for (i = 0; i < j; i++) {
-    Smod_data[i] = 0.0;
-  }
-  emxInit_real_T(&XJ, 3);
-  i = XJ->size[0] * XJ->size[1] * XJ->size[2];
-  XJ->size[0] = 6;
-  XJ->size[1] = 6;
-  XJ->size[2] = (int)N;
-  emxEnsureCapacity_real_T(XJ, i);
-  XJ_data = XJ->data;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    XJ_data[i] = 0.0;
-  }
-  emxInit_real_T(&Xup, 3);
-  i = Xup->size[0] * Xup->size[1] * Xup->size[2];
-  Xup->size[0] = 6;
-  Xup->size[1] = 6;
-  Xup->size[2] = (int)N;
-  emxEnsureCapacity_real_T(Xup, i);
-  Xup_data = Xup->data;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    Xup_data[i] = 0.0;
-  }
-  emxInit_real_T(&b_v, 2);
-  i = b_v->size[0] * b_v->size[1];
-  b_v->size[0] = 6;
-  b_v->size[1] = (int)N;
-  emxEnsureCapacity_real_T(b_v, i);
-  v_data = b_v->data;
-  loop_ub_tmp = 6 * (int)N;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    v_data[i] = 0.0;
-  }
-  emxInit_real_T(&a, 2);
-  i = a->size[0] * a->size[1];
-  a->size[0] = 6;
-  a->size[1] = (int)N;
-  emxEnsureCapacity_real_T(a, i);
-  a_data = a->data;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    a_data[i] = 0.0;
-  }
-  emxInit_real_T(&f, 2);
-  i = f->size[0] * f->size[1];
-  f->size[0] = 6;
-  f->size[1] = (int)N;
-  emxEnsureCapacity_real_T(f, i);
-  f_data = f->data;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    f_data[i] = 0.0;
-  }
-  loop_ub_tmp = (int)Nq_tmp;
-  i = C->size[0];
-  C->size[0] = (int)Nq_tmp;
-  emxEnsureCapacity_real_T(C, i);
-  C_data = C->data;
-  for (i = 0; i < loop_ub_tmp; i++) {
-    C_data[i] = 0.0;
-  }
-  i = J->size[0] * J->size[1];
-  J->size[0] = 6;
-  J->size[1] = (int)Nq_tmp;
-  emxEnsureCapacity_real_T(J, i);
-  J_data = J->data;
-  j = 6 * (int)Nq_tmp;
-  for (i = 0; i < j; i++) {
-    J_data[i] = 0.0;
-  }
-  for (i = 0; i < 36; i++) {
-    Xtree[i] = b[i];
+  memset(&XJ[0], 0, 144U * sizeof(double));
+  memset(&Xup[0], 0, 144U * sizeof(double));
+  memset(&b_v[0], 0, 24U * sizeof(double));
+  memset(&a[0], 0, 24U * sizeof(double));
+  memset(&f[0], 0, 24U * sizeof(double));
+  memset(&C[0], 0, 10U * sizeof(double));
+  for (b_i = 0; b_i < 36; b_i++) {
+    Xtree[b_i] = b[b_i];
   }
   /* [diag(ones(3,1)) [0;0;0]; 0 0 0 1]; */
-  vJ_tmp_tmp = sin(q[0]);
-  vJ_tmp = cos(q[0]);
-  g[0] = vJ_tmp;
-  g[4] = -vJ_tmp_tmp;
+  g_tmp = sin(q[0]);
+  b_g_tmp = cos(q[0]);
+  g[0] = b_g_tmp;
+  g[4] = -g_tmp;
   g[8] = 0.0;
   g[12] = 0.0;
-  g[1] = vJ_tmp_tmp;
-  g[5] = vJ_tmp;
+  g[1] = g_tmp;
+  g[5] = b_g_tmp;
   g[9] = 0.0;
   g[13] = 0.0;
   g[2] = 0.0;
@@ -262,719 +150,925 @@ void MC_3_cg(const double q[10], const double qd[10], double m, double r,
   /*  This function calculates the adjoint given simply the transform between */
   /*  joints */
   /*  get skew symmetric matrix of translation */
-  for (i = 0; i < 3; i++) {
-    skw[3 * i] = g[i];
-    skw[3 * i + 1] = g[i + 4];
-    skw[3 * i + 2] = g[i + 8];
+  for (b_i = 0; b_i < 3; b_i++) {
+    skw[3 * b_i] = g[b_i];
+    skw[3 * b_i + 1] = g[b_i + 4];
+    skw[3 * b_i + 2] = g[b_i + 8];
   }
-  for (i = 0; i < 9; i++) {
-    b_skw[i] = -skw[i];
+  for (b_i = 0; b_i < 9; b_i++) {
+    b_skw[b_i] = -skw[b_i];
   }
-  iv[0] = 0;
-  iv[3] = 0;
-  iv[6] = 0;
-  iv[1] = 0;
-  iv[4] = 0;
-  iv[7] = 0;
-  iv[2] = 0;
-  iv[5] = 0;
-  iv[8] = 0;
-  for (i = 0; i < 3; i++) {
-    d = b_skw[i];
-    vJ_tmp = b_skw[i + 3];
-    d1 = b_skw[i + 6];
-    for (i3 = 0; i3 < 3; i3++) {
-      c_skw[i + 3 * i3] =
-          (d * (double)iv[3 * i3] + vJ_tmp * (double)iv[3 * i3 + 1]) +
-          d1 * (double)iv[3 * i3 + 2];
-      XJ_data[i3 + 6 * i] = skw[i3 + 3 * i];
+  dv[0] = 0.0;
+  dv[3] = -0.0;
+  dv[6] = 0.0;
+  dv[1] = 0.0;
+  dv[4] = 0.0;
+  dv[7] = -0.0;
+  dv[2] = -0.0;
+  dv[5] = 0.0;
+  dv[8] = 0.0;
+  for (b_i = 0; b_i < 3; b_i++) {
+    b_a = b_skw[b_i];
+    g_tmp_tmp = b_skw[b_i + 3];
+    a_tmp = b_skw[b_i + 6];
+    for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+      c_skw[b_i + 3 * b_XJ_tmp] =
+          (b_a * dv[3 * b_XJ_tmp] + g_tmp_tmp * dv[3 * b_XJ_tmp + 1]) +
+          a_tmp * dv[3 * b_XJ_tmp + 2];
+      XJ[b_XJ_tmp + 6 * b_i] = skw[b_XJ_tmp + 3 * b_i];
     }
   }
-  for (i = 0; i < 3; i++) {
-    i3 = 6 * (i + 3);
-    XJ_data[i3] = c_skw[3 * i];
-    XJ_data[6 * i + 3] = 0.0;
-    XJ_data[i3 + 3] = skw[3 * i];
-    loop_ub_tmp = 3 * i + 1;
-    XJ_data[i3 + 1] = c_skw[loop_ub_tmp];
-    XJ_data[6 * i + 4] = 0.0;
-    XJ_data[i3 + 4] = skw[loop_ub_tmp];
-    loop_ub_tmp = 3 * i + 2;
-    XJ_data[i3 + 2] = c_skw[loop_ub_tmp];
-    XJ_data[6 * i + 5] = 0.0;
-    XJ_data[i3 + 5] = skw[loop_ub_tmp];
+  for (b_i = 0; b_i < 3; b_i++) {
+    XJ_tmp = 6 * (b_i + 3);
+    XJ[XJ_tmp] = c_skw[3 * b_i];
+    XJ[6 * b_i + 3] = 0.0;
+    XJ[XJ_tmp + 3] = skw[3 * b_i];
+    b_XJ_tmp = 3 * b_i + 1;
+    XJ[XJ_tmp + 1] = c_skw[b_XJ_tmp];
+    XJ[6 * b_i + 4] = 0.0;
+    XJ[XJ_tmp + 4] = skw[b_XJ_tmp];
+    b_XJ_tmp = 3 * b_i + 2;
+    XJ[XJ_tmp + 2] = c_skw[b_XJ_tmp];
+    XJ[6 * b_i + 5] = 0.0;
+    XJ[XJ_tmp + 5] = skw[b_XJ_tmp];
   }
-  for (b_i = 0; b_i < 6; b_i++) {
-    for (i = 0; i < 6; i++) {
-      d = 0.0;
-      for (i3 = 0; i3 < 6; i3++) {
-        d += XJ_data[b_i + 6 * i3] * (double)b[i3 + 6 * i];
+  for (i = 0; i < 6; i++) {
+    for (b_i = 0; b_i < 6; b_i++) {
+      b_a = 0.0;
+      for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+        b_a += XJ[i + 6 * b_XJ_tmp] * (double)b[b_XJ_tmp + 6 * b_i];
       }
-      Xup_data[b_i + 6 * i] = d;
+      Xup[i + 6 * b_i] = b_a;
     }
-    d = (double)b_a[b_i] * qd[0];
-    vJ[b_i] = d;
-    v_data[b_i] = d;
+    b_a = (double)c_a[i] * qd[0];
+    vJ[i] = b_a;
+    b_v[i] = b_a;
   }
   memset(&I_tmp[0], 0, 36U * sizeof(double));
   skw[0] = 0.0;
-  skw[3] = -v_data[5];
-  skw[6] = v_data[4];
-  skw[1] = v_data[5];
+  skw[3] = -b_v[5];
+  skw[6] = b_v[4];
+  skw[1] = b_v[5];
   skw[4] = 0.0;
-  skw[7] = -v_data[3];
-  skw[2] = -v_data[4];
-  skw[5] = v_data[3];
+  skw[7] = -b_v[3];
+  skw[2] = -b_v[4];
+  skw[5] = b_v[3];
   skw[8] = 0.0;
-  for (i = 0; i < 3; i++) {
-    vJ_tmp_tmp = skw[3 * i];
-    I_tmp[6 * i] = vJ_tmp_tmp;
-    loop_ub_tmp = 6 * (i + 3);
-    I_tmp[loop_ub_tmp + 3] = vJ_tmp_tmp;
-    vJ_tmp_tmp = skw[3 * i + 1];
-    I_tmp[6 * i + 1] = vJ_tmp_tmp;
-    I_tmp[loop_ub_tmp + 4] = vJ_tmp_tmp;
-    vJ_tmp_tmp = skw[3 * i + 2];
-    I_tmp[6 * i + 2] = vJ_tmp_tmp;
-    I_tmp[loop_ub_tmp + 5] = vJ_tmp_tmp;
+  for (b_i = 0; b_i < 3; b_i++) {
+    vJ_tmp = skw[3 * b_i];
+    I_tmp[6 * b_i] = vJ_tmp;
+    XJ_tmp = 6 * (b_i + 3);
+    I_tmp[XJ_tmp + 3] = vJ_tmp;
+    vJ_tmp = skw[3 * b_i + 1];
+    I_tmp[6 * b_i + 1] = vJ_tmp;
+    I_tmp[XJ_tmp + 4] = vJ_tmp;
+    vJ_tmp = skw[3 * b_i + 2];
+    I_tmp[6 * b_i + 2] = vJ_tmp;
+    I_tmp[XJ_tmp + 5] = vJ_tmp;
   }
   I_tmp[18] = 0.0;
-  I_tmp[24] = -v_data[2];
-  I_tmp[30] = v_data[1];
-  I_tmp[19] = v_data[2];
+  I_tmp[24] = -b_v[2];
+  I_tmp[30] = b_v[1];
+  I_tmp[19] = b_v[2];
   I_tmp[25] = 0.0;
-  I_tmp[31] = -v_data[0];
-  I_tmp[20] = -v_data[1];
-  I_tmp[26] = v_data[0];
+  I_tmp[31] = -b_v[0];
+  I_tmp[20] = -b_v[1];
+  I_tmp[26] = b_v[0];
   I_tmp[32] = 0.0;
-  for (i = 0; i < 6; i++) {
-    d = 0.0;
-    vJ_tmp = 0.0;
-    for (i3 = 0; i3 < 6; i3++) {
-      j = i + 6 * i3;
-      d += Xup_data[j] * b_b[i3];
-      d1 = I_tmp[j];
-      vJ_tmp += d1 * vJ[i3];
-      b_I_tmp[i3 + 6 * i] = -d1;
+  for (b_i = 0; b_i < 6; b_i++) {
+    b_a = 0.0;
+    g_tmp_tmp = 0.0;
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+      i1 = b_i + 6 * b_XJ_tmp;
+      b_a += Xup[i1] * b_b[b_XJ_tmp];
+      a_tmp = I_tmp[i1];
+      g_tmp_tmp += a_tmp * vJ[b_XJ_tmp];
+      b_I_tmp[b_XJ_tmp + 6 * b_i] = -a_tmp;
     }
-    a_data[i] = d + vJ_tmp;
+    a[b_i] = b_a + g_tmp_tmp;
   }
-  for (i = 0; i < 6; i++) {
-    c_I[i] = 0.0;
-    vJ[i] = 0.0;
-    for (i3 = 0; i3 < 6; i3++) {
-      d = 0.0;
-      for (j = 0; j < 6; j++) {
-        d += b_I_tmp[i + 6 * j] * I_data[j + 6 * i3];
+  for (b_i = 0; b_i < 6; b_i++) {
+    c_I[b_i] = 0.0;
+    vJ[b_i] = 0.0;
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+      b_a = 0.0;
+      for (i1 = 0; i1 < 6; i1++) {
+        b_a += b_I_tmp[b_i + 6 * i1] * b_I[i1 + 6 * b_XJ_tmp];
       }
-      c_I[i] += I_data[i + 6 * i3] * a_data[i3];
-      vJ[i] += d * v_data[i3];
-      j = i3 + 6 * i;
-      X[j] = Xup_data[j];
+      c_I[b_i] += b_I[b_i + 6 * b_XJ_tmp] * a[b_XJ_tmp];
+      vJ[b_i] += b_a * b_v[b_XJ_tmp];
     }
-    f_data[i] = c_I[i] + vJ[i];
+    f[b_i] = c_I[b_i] + vJ[b_i];
   }
   /*  Recursive Newton Euler to Calculate C+G */
-  emxInit_real_T(&qi, 2);
-  qi_data = qi->data;
-  emxInit_real_T(&b_q, 1);
-  emxInit_real_T(&b_qd, 1);
-  for (b_i = 0; b_i < i2; b_i++) {
+  dv[0] = 0.0;
+  dv[4] = 0.0;
+  dv[8] = 0.0;
+  for (i = 0; i < 3; i++) {
     double b_Xup[6];
-    double b_qd_tmp;
-    double c_qd_tmp;
-    double d2;
-    double d3;
-    double d4;
-    double qd_tmp;
-    vJ_tmp_tmp = (((double)b_i + 2.0) - 2.0) * 3.0;
-    if (vJ_tmp_tmp + 4.0 < vJ_tmp_tmp + 2.0) {
-      qi->size[0] = 1;
-      qi->size[1] = 0;
+    double b_del_tmp;
+    double c_del_tmp;
+    double d_Smod_tmp_tmp;
+    double d_del_tmp;
+    double d_fh3_tmp;
+    double del_tmp;
+    double e_del_tmp;
+    double f_del_tmp;
+    double n_fh3_tmp;
+    double o_fh3_tmp;
+    double p_fh3_tmp;
+    b_XJ_tmp = i * 3 + 2;
+    XJ_tmp = i * 3 + 4;
+    if (XJ_tmp < b_XJ_tmp) {
     } else {
-      i = qi->size[0] * qi->size[1];
-      qi->size[0] = 1;
-      j = (int)((vJ_tmp_tmp + 4.0) - (vJ_tmp_tmp + 2.0));
-      qi->size[1] = j + 1;
-      emxEnsureCapacity_real_T(qi, i);
-      qi_data = qi->data;
-      for (i = 0; i <= j; i++) {
-        qi_data[i] = (vJ_tmp_tmp + 2.0) + (double)i;
+      XJ_tmp -= b_XJ_tmp;
+      for (b_i = 0; b_i <= XJ_tmp; b_i++) {
+        qi_data[b_i] = (signed char)(b_XJ_tmp + b_i);
       }
     }
-    i = b_q->size[0];
-    b_q->size[0] = qi->size[1];
-    emxEnsureCapacity_real_T(b_q, i);
-    q_data = b_q->data;
-    j = qi->size[1];
-    i = b_qd->size[0];
-    b_qd->size[0] = qi->size[1];
-    emxEnsureCapacity_real_T(b_qd, i);
-    qd_data = b_qd->data;
-    for (i = 0; i < j; i++) {
-      d = qi_data[i];
-      q_data[i] = q[(int)d - 1];
-      qd_data[i] = qd[(int)d - 1];
+    del_tmp = q[qi_data[0] - 1];
+    b_del_tmp = q[qi_data[1] - 1];
+    c_del_tmp = del_tmp * del_tmp;
+    d_del_tmp = b_del_tmp * b_del_tmp;
+    e_del_tmp = c_del_tmp + d_del_tmp;
+    f_del_tmp = sqrt(e_del_tmp);
+    if (f_del_tmp < 1.0E-6) {
+      memset(&skw[0], 0, 9U * sizeof(double));
+      skw[0] = 1.0;
+      skw[4] = 1.0;
+      skw[8] = 1.0;
+      for (b_i = 0; b_i < 3; b_i++) {
+        XJ_tmp = b_i << 2;
+        g[XJ_tmp] = skw[3 * b_i];
+        g[XJ_tmp + 1] = skw[3 * b_i + 1];
+        g[XJ_tmp + 2] = skw[3 * b_i + 2];
+      }
+      double Smod_tmp;
+      double b_fh3_tmp;
+      double c_fh3_tmp;
+      double fh3_tmp;
+      g[12] = 0.0;
+      g[13] = 0.0;
+      g_tmp_tmp = q[qi_data[2] - 1];
+      g_tmp = L0 + g_tmp_tmp;
+      g[14] = g_tmp;
+      g[3] = 0.0;
+      g[7] = 0.0;
+      g[11] = 0.0;
+      g[15] = 1.0;
+      Smod_tmp = g_tmp / (2.0 * r);
+      Smod[18 * i] = Smod_tmp;
+      Smod[18 * i + 6] = 0.0;
+      Smod[18 * i + 12] = 0.0;
+      Smod[18 * i + 1] = 0.0;
+      Smod[18 * i + 7] = Smod_tmp;
+      Smod[18 * i + 13] = 0.0;
+      Smod[18 * i + 3] = 0.0;
+      Smod[18 * i + 9] = -1.0 / r;
+      Smod[18 * i + 15] = 0.0;
+      Smod[18 * i + 4] = 1.0 / r;
+      Smod[18 * i + 10] = 0.0;
+      Smod[18 * i + 16] = 0.0;
+      fh3_tmp = qd[qi_data[2] - 1] / (2.0 * r);
+      fh3[0] = fh3_tmp;
+      fh3[6] = 0.0;
+      b_fh3_tmp = qd[qi_data[0] - 1];
+      fh3[12] = -b_fh3_tmp / (2.0 * r);
+      fh3[1] = 0.0;
+      fh3[7] = fh3_tmp;
+      fh3_tmp = qd[qi_data[1] - 1];
+      fh3[13] = -fh3_tmp / (2.0 * r);
+      c_fh3_tmp = 6.0 * vJ_tmp_tmp;
+      fh3[2] = b_fh3_tmp * g_tmp / c_fh3_tmp;
+      fh3[8] = (L0 * fh3_tmp + fh3_tmp * g_tmp_tmp) / c_fh3_tmp;
+      fh3[14] = 0.0;
+      Smod[18 * i + 2] = 0.0;
+      Smod[18 * i + 5] = 0.0;
+      fh3[3] = 0.0;
+      fh3[4] = 0.0;
+      Smod[18 * i + 8] = 0.0;
+      Smod[18 * i + 11] = 0.0;
+      fh3[9] = 0.0;
+      fh3[10] = 0.0;
+      Smod[18 * i + 14] = 1.0;
+      Smod[18 * i + 17] = 0.0;
+      fh3[15] = 0.0;
+      fh3[16] = 0.0;
+      c_fh3_tmp = 2.0 * vJ_tmp_tmp;
+      fh3[5] = fh3_tmp / c_fh3_tmp;
+      fh3[11] = -b_fh3_tmp / c_fh3_tmp;
+      fh3[17] = 0.0;
+    } else {
+      double Smod_tmp;
+      double Smod_tmp_tmp;
+      double Smod_tmp_tmp_tmp;
+      double b_Smod_tmp;
+      double b_Smod_tmp_tmp;
+      double b_a_tmp;
+      double b_fh3_tmp;
+      double b_fh3_tmp_tmp;
+      double b_fh3_tmp_tmp_tmp;
+      double b_g_tmp_tmp;
+      double c_Smod_tmp;
+      double c_Smod_tmp_tmp;
+      double c_fh3_tmp;
+      double c_fh3_tmp_tmp;
+      double c_g_tmp_tmp;
+      double d_Smod_tmp;
+      double d_fh3_tmp_tmp;
+      double e_Smod_tmp;
+      double e_Smod_tmp_tmp;
+      double e_fh3_tmp;
+      double e_fh3_tmp_tmp;
+      double f_Smod_tmp;
+      double f_Smod_tmp_tmp;
+      double f_fh3_tmp;
+      double fh3_tmp;
+      double fh3_tmp_tmp;
+      double fh3_tmp_tmp_tmp;
+      double g_Smod_tmp;
+      double g_Smod_tmp_tmp;
+      double g_fh3_tmp;
+      double h_Smod_tmp;
+      double h_Smod_tmp_tmp;
+      double h_fh3_tmp;
+      double i_Smod_tmp;
+      double i_fh3_tmp;
+      double j_Smod_tmp;
+      double j_fh3_tmp;
+      double k_Smod_tmp;
+      double k_fh3_tmp;
+      double l_Smod_tmp;
+      double l_fh3_tmp;
+      double m_Smod_tmp;
+      double m_fh3_tmp;
+      double n_Smod_tmp;
+      double o_Smod_tmp;
+      double p_Smod_tmp;
+      double q_Smod_tmp;
+      double r_Smod_tmp;
+      vJ_tmp = f_del_tmp * f_del_tmp;
+      b_a_tmp = L0 + q[qi_data[2] - 1];
+      a_tmp = r * b_a_tmp;
+      b_a = a_tmp / vJ_tmp;
+      g_tmp_tmp = f_del_tmp / r;
+      b_g_tmp_tmp = cos(g_tmp_tmp);
+      g[0] = c_del_tmp / vJ_tmp * (b_g_tmp_tmp - 1.0) + 1.0;
+      c_g_tmp_tmp = del_tmp * b_del_tmp;
+      g_tmp = c_g_tmp_tmp / vJ_tmp * (b_g_tmp_tmp - 1.0);
+      g[1] = g_tmp;
+      b_g_tmp = sin(g_tmp_tmp);
+      g[2] = -del_tmp / f_del_tmp * b_g_tmp;
+      g[4] = g_tmp;
+      g[5] = d_del_tmp / vJ_tmp * (b_g_tmp_tmp - 1.0) + 1.0;
+      g[6] = -b_del_tmp / f_del_tmp * b_g_tmp;
+      g[8] = del_tmp / f_del_tmp * b_g_tmp;
+      g[9] = b_del_tmp / f_del_tmp * b_g_tmp;
+      g[10] = b_g_tmp_tmp;
+      g[12] = b_a * (del_tmp * (1.0 - b_g_tmp_tmp));
+      g[13] = b_a * (b_del_tmp * (1.0 - b_g_tmp_tmp));
+      g_tmp = f_del_tmp * b_g_tmp;
+      g[14] = b_a * g_tmp;
+      g[3] = 0.0;
+      g[7] = 0.0;
+      g[11] = 0.0;
+      g[15] = 1.0;
+      Smod_tmp_tmp = c_del_tmp * b_g_tmp;
+      Smod_tmp = Smod_tmp_tmp * b_a_tmp;
+      b_Smod_tmp = e_del_tmp * e_del_tmp;
+      c_Smod_tmp = rt_powd_snf(e_del_tmp, 1.5);
+      vJ_tmp = a_tmp * (b_g_tmp_tmp - 1.0);
+      d_Smod_tmp = vJ_tmp / e_del_tmp;
+      b_Smod_tmp_tmp = r * b_g_tmp;
+      e_Smod_tmp = b_g_tmp_tmp * f_del_tmp - b_Smod_tmp_tmp;
+      c_Smod_tmp_tmp = rt_powd_snf(e_del_tmp, 3.0);
+      Smod_tmp_tmp_tmp = c_del_tmp * d_del_tmp;
+      d_Smod_tmp_tmp = Smod_tmp_tmp_tmp * b_a_tmp * (b_g_tmp_tmp - 1.0);
+      g_tmp_tmp = (g_tmp - 2.0 * r) + 2.0 * r * b_g_tmp_tmp;
+      f_Smod_tmp = d_Smod_tmp_tmp * g_tmp_tmp / c_Smod_tmp_tmp;
+      e_Smod_tmp_tmp = c_del_tmp * b_g_tmp_tmp;
+      g_Smod_tmp = d_del_tmp + e_Smod_tmp_tmp;
+      h_Smod_tmp =
+          (Smod_tmp / c_Smod_tmp - d_Smod_tmp) +
+          2.0 * r * c_del_tmp * b_a_tmp * (b_g_tmp_tmp - 1.0) / b_Smod_tmp;
+      Smod[18 * i] = (g_Smod_tmp * h_Smod_tmp / e_del_tmp -
+                      Smod_tmp * e_Smod_tmp / b_Smod_tmp) +
+                     f_Smod_tmp;
+      Smod[18 * i + 6] = 0.0;
+      Smod_tmp = r * del_tmp * (b_g_tmp_tmp - 1.0);
+      Smod[18 * i + 12] = Smod_tmp / e_del_tmp;
+      Smod[18 * i + 1] = 0.0;
+      f_Smod_tmp_tmp = d_del_tmp * b_g_tmp;
+      i_Smod_tmp = f_Smod_tmp_tmp * b_a_tmp;
+      g_Smod_tmp_tmp = d_del_tmp * b_g_tmp_tmp;
+      j_Smod_tmp = c_del_tmp + g_Smod_tmp_tmp;
+      d_Smod_tmp =
+          (i_Smod_tmp / c_Smod_tmp - d_Smod_tmp) +
+          2.0 * r * d_del_tmp * b_a_tmp * (b_g_tmp_tmp - 1.0) / b_Smod_tmp;
+      Smod[18 * i + 7] = (j_Smod_tmp * d_Smod_tmp / e_del_tmp -
+                          i_Smod_tmp * e_Smod_tmp / b_Smod_tmp) +
+                         f_Smod_tmp;
+      f_Smod_tmp = r * b_del_tmp * (b_g_tmp_tmp - 1.0);
+      Smod[18 * i + 13] = f_Smod_tmp / e_del_tmp;
+      i_Smod_tmp = c_Smod_tmp - b_Smod_tmp_tmp * e_del_tmp;
+      k_Smod_tmp = rt_powd_snf(e_del_tmp, 2.5);
+      l_Smod_tmp = del_tmp * b_a_tmp;
+      Smod[18 * i + 2] = l_Smod_tmp * i_Smod_tmp / k_Smod_tmp;
+      m_Smod_tmp = b_del_tmp * b_a_tmp;
+      Smod[18 * i + 8] = m_Smod_tmp * i_Smod_tmp / k_Smod_tmp;
+      Smod[18 * i + 14] = b_Smod_tmp_tmp / f_del_tmp;
+      n_Smod_tmp = r * c_Smod_tmp;
+      h_Smod_tmp_tmp = f_del_tmp - b_Smod_tmp_tmp;
+      o_Smod_tmp = c_g_tmp_tmp * h_Smod_tmp_tmp;
+      Smod[18 * i + 3] = -o_Smod_tmp / n_Smod_tmp;
+      p_Smod_tmp = d_del_tmp * f_del_tmp + r * c_del_tmp * b_g_tmp;
+      Smod[18 * i + 9] = -p_Smod_tmp / n_Smod_tmp;
+      Smod[18 * i + 15] = 0.0;
+      q_Smod_tmp = c_del_tmp * f_del_tmp + r * d_del_tmp * b_g_tmp;
+      Smod[18 * i + 4] = q_Smod_tmp / n_Smod_tmp;
+      Smod[18 * i + 10] = o_Smod_tmp / n_Smod_tmp;
+      Smod[18 * i + 16] = 0.0;
+      o_Smod_tmp = b_del_tmp * (b_g_tmp_tmp - 1.0);
+      Smod[18 * i + 5] = -o_Smod_tmp / e_del_tmp;
+      r_Smod_tmp = del_tmp * (b_g_tmp_tmp - 1.0);
+      Smod[18 * i + 11] = r_Smod_tmp / e_del_tmp;
+      Smod[18 * i + 17] = 0.0;
+      /*      J = [ -(d*(L0 + dL)*(cos(del/d)*dx^2 + dy^2)*(cos(del/d) -
+       * 1))/del^4,                                                -(d*dx*dy*(L0
+       * + dL)*(cos(del/d) - 1)^2)/del^4, - (d*dx*sin(del/d)^2)/del^2 -
+       * (d*dx*dy^2*(cos(del/d) - 1)^2)/del^4 - (d*dx*(cos(del/d)*dx^2 +
+       * dy^2)*(cos(del/d) - 1))/del^4; */
+      /*                                                                                  -(d*dx*dy*(L0
+       * + dL)*(cos(del/d) - 1)^2)/del^4,                               -(d*(L0
+       * + dL)*(dx^2 + cos(del/d)*dy^2)*(cos(del/d) - 1))/del^4,
+       * (d*dy*sin(del/d)^2)/del^2 - (d*dx^2*dy*(cos(del/d) - 1)^2)/del^4 -
+       * (d*dy*(dx^2 + cos(del/d)*dy^2)*(cos(del/d) - 1))/del^4; */
+      /*                                                                            -(d*dx*sin(del/d)*(L0
+       * + dL)*(cos(del/d) - 1))/del^3, (d*dy*sin(del/d)*(L0 + dL)*(cos(del/d) -
+       * 1))/del^3, (d*sin(del/d)*(del^2*cos(del/d) - dx^2*cos(del/d) +
+       * dy^2*cos(del/d) + dx^2 - dy^2))/del^3; */
+      /*                                                                                      (dx*dy*sin(del/d)*(cos(del/d)
+       * - 1))/del^3, -(sin(del/d)*(del^2*cos(del/d) - dx^2*cos(del/d) +
+       * 2*dy^2*cos(del/d) + dx^2 - 2*dy^2))/del^3, 0; */
+      /*                                                                                    (sin(del/d)*(cos(del/d)*dx^2
+       * + dy^2))/del^3, (dx*dy*sin(del/d)*(cos(del/d) - 1))/del^3, 0; */
+      /*          (dy*(dx^2 + cos(del/d)*dy^2)*(cos(del/d) - 1))/del^4 -
+       * (dy*sin(del/d)^2)/del^2 + (2*dx^2*dy*(cos(del/d) - 1)^2)/del^4,
+       * (dx*(dx^2 + cos(del/d)*dy^2)*(cos(del/d) - 1))/del^4, 0]; */
+      fh3_tmp = qd[qi_data[2] - 1];
+      fh3_tmp_tmp_tmp = qd[qi_data[0] - 1];
+      fh3_tmp_tmp = 2.0 * del_tmp * fh3_tmp_tmp_tmp;
+      b_fh3_tmp_tmp_tmp = qd[qi_data[1] - 1];
+      b_fh3_tmp_tmp = 2.0 * b_del_tmp * b_fh3_tmp_tmp_tmp;
+      b_fh3_tmp = fh3_tmp_tmp + b_fh3_tmp_tmp;
+      c_fh3_tmp_tmp = fh3_tmp * c_del_tmp;
+      c_fh3_tmp = c_fh3_tmp_tmp * b_g_tmp;
+      e_fh3_tmp = 2.0 * r * b_Smod_tmp;
+      f_fh3_tmp = fh3_tmp_tmp * b_g_tmp * b_a_tmp;
+      g_fh3_tmp = e_Smod_tmp_tmp * b_a_tmp;
+      h_fh3_tmp = 2.0 * c_del_tmp;
+      i_fh3_tmp = 2.0 * c_Smod_tmp;
+      j_fh3_tmp = b_g_tmp * b_a_tmp * b_fh3_tmp / i_fh3_tmp -
+                  r * fh3_tmp * (b_g_tmp_tmp - 1.0) / e_del_tmp;
+      k_fh3_tmp = 2.0 * k_Smod_tmp;
+      l_fh3_tmp = 2.0 * r * fh3_tmp;
+      a_tmp = vJ_tmp * b_fh3_tmp / b_Smod_tmp;
+      g_tmp = 2.0 * r * f_del_tmp;
+      m_fh3_tmp = b_g_tmp * b_g_tmp;
+      d_fh3_tmp_tmp = b_g_tmp_tmp * b_fh3_tmp;
+      e_fh3_tmp_tmp = 2.0 * f_del_tmp;
+      d_fh3_tmp =
+          d_Smod_tmp_tmp *
+          (b_g_tmp * b_fh3_tmp / e_fh3_tmp_tmp - d_fh3_tmp_tmp / (2.0 * r)) /
+          c_Smod_tmp_tmp;
+      n_fh3_tmp = c_fh3_tmp_tmp * d_del_tmp * (b_g_tmp_tmp - 1.0) * g_tmp_tmp /
+                  c_Smod_tmp_tmp;
+      d_Smod_tmp_tmp = 2.0 * r * k_Smod_tmp;
+      o_fh3_tmp = 3.0 * c_del_tmp * d_del_tmp * b_a_tmp * (b_g_tmp_tmp - 1.0) *
+                  b_fh3_tmp * g_tmp_tmp / rt_powd_snf(e_del_tmp, 4.0);
+      p_fh3_tmp = fh3_tmp_tmp * d_del_tmp * b_a_tmp * (b_g_tmp_tmp - 1.0) *
+                  g_tmp_tmp / c_Smod_tmp_tmp;
+      b_a = h_fh3_tmp * b_del_tmp * b_fh3_tmp_tmp_tmp * b_a_tmp *
+            (b_g_tmp_tmp - 1.0) * g_tmp_tmp / c_Smod_tmp_tmp;
+      c_fh3_tmp_tmp = rt_powd_snf(e_del_tmp, 3.5);
+      vJ_tmp = Smod_tmp_tmp_tmp * b_g_tmp * b_a_tmp * b_fh3_tmp * g_tmp_tmp /
+               (2.0 * r * c_fh3_tmp_tmp);
+      fh3[0] =
+          ((((((((((((g_Smod_tmp *
+                          ((((((((j_fh3_tmp + c_fh3_tmp / c_Smod_tmp) -
+                                 5.0 * c_del_tmp * b_g_tmp * b_a_tmp *
+                                     b_fh3_tmp / k_fh3_tmp) +
+                                f_fh3_tmp / c_Smod_tmp) +
+                               l_fh3_tmp * c_del_tmp * (b_g_tmp_tmp - 1.0) /
+                                   b_Smod_tmp) +
+                              a_tmp) +
+                             4.0 * r * del_tmp * fh3_tmp_tmp_tmp * b_a_tmp *
+                                 (b_g_tmp_tmp - 1.0) / b_Smod_tmp) -
+                            4.0 * r * c_del_tmp * b_a_tmp *
+                                (b_g_tmp_tmp - 1.0) * b_fh3_tmp /
+                                c_Smod_tmp_tmp) +
+                           g_fh3_tmp * b_fh3_tmp / e_fh3_tmp) /
+                          e_del_tmp +
+                      h_Smod_tmp *
+                          ((b_fh3_tmp_tmp + fh3_tmp_tmp * b_g_tmp_tmp) -
+                           Smod_tmp_tmp * b_fh3_tmp / g_tmp) /
+                          e_del_tmp) -
+                     g_Smod_tmp * b_fh3_tmp * h_Smod_tmp / b_Smod_tmp) -
+                    c_fh3_tmp * e_Smod_tmp / b_Smod_tmp) +
+                   c_del_tmp * m_fh3_tmp * b_a_tmp * b_fh3_tmp / e_fh3_tmp) +
+                  h_fh3_tmp * b_g_tmp * b_a_tmp * e_Smod_tmp * b_fh3_tmp /
+                      c_Smod_tmp_tmp) -
+                 d_fh3_tmp) -
+                f_fh3_tmp * e_Smod_tmp / b_Smod_tmp) +
+               n_fh3_tmp) -
+              g_fh3_tmp * e_Smod_tmp * b_fh3_tmp / d_Smod_tmp_tmp) -
+             o_fh3_tmp) +
+            p_fh3_tmp) +
+           b_a) -
+          vJ_tmp;
+      fh3[6] = 0.0;
+      c_fh3_tmp = del_tmp * b_g_tmp * b_fh3_tmp;
+      fh3[12] = (r * fh3_tmp_tmp_tmp * (b_g_tmp_tmp - 1.0) / e_del_tmp -
+                 c_fh3_tmp / i_fh3_tmp) -
+                Smod_tmp * b_fh3_tmp / b_Smod_tmp;
+      fh3[1] = 0.0;
+      f_fh3_tmp = fh3_tmp * d_del_tmp * b_g_tmp;
+      g_fh3_tmp = b_fh3_tmp_tmp * b_g_tmp * b_a_tmp;
+      h_fh3_tmp = g_Smod_tmp_tmp * b_a_tmp;
+      fh3[7] =
+          ((((((((((((j_Smod_tmp *
+                          ((((((((j_fh3_tmp + f_fh3_tmp / c_Smod_tmp) -
+                                 5.0 * d_del_tmp * b_g_tmp * b_a_tmp *
+                                     b_fh3_tmp / k_fh3_tmp) +
+                                g_fh3_tmp / c_Smod_tmp) +
+                               l_fh3_tmp * d_del_tmp * (b_g_tmp_tmp - 1.0) /
+                                   b_Smod_tmp) +
+                              a_tmp) +
+                             4.0 * r * b_del_tmp * b_fh3_tmp_tmp_tmp * b_a_tmp *
+                                 (b_g_tmp_tmp - 1.0) / b_Smod_tmp) -
+                            4.0 * r * d_del_tmp * b_a_tmp *
+                                (b_g_tmp_tmp - 1.0) * b_fh3_tmp /
+                                c_Smod_tmp_tmp) +
+                           h_fh3_tmp * b_fh3_tmp / e_fh3_tmp) /
+                          e_del_tmp +
+                      d_Smod_tmp *
+                          ((fh3_tmp_tmp + b_fh3_tmp_tmp * b_g_tmp_tmp) -
+                           f_Smod_tmp_tmp * b_fh3_tmp / g_tmp) /
+                          e_del_tmp) -
+                     j_Smod_tmp * b_fh3_tmp * d_Smod_tmp / b_Smod_tmp) -
+                    f_fh3_tmp * e_Smod_tmp / b_Smod_tmp) +
+                   d_del_tmp * m_fh3_tmp * b_a_tmp * b_fh3_tmp / e_fh3_tmp) +
+                  2.0 * d_del_tmp * b_g_tmp * b_a_tmp * e_Smod_tmp * b_fh3_tmp /
+                      c_Smod_tmp_tmp) -
+                 d_fh3_tmp) -
+                g_fh3_tmp * e_Smod_tmp / b_Smod_tmp) +
+               n_fh3_tmp) -
+              h_fh3_tmp * e_Smod_tmp * b_fh3_tmp / d_Smod_tmp_tmp) -
+             o_fh3_tmp) +
+            p_fh3_tmp) +
+           b_a) -
+          vJ_tmp;
+      e_fh3_tmp = b_del_tmp * b_g_tmp * b_fh3_tmp;
+      fh3[13] = (r * b_fh3_tmp_tmp_tmp * (b_g_tmp_tmp - 1.0) / e_del_tmp -
+                 e_fh3_tmp / i_fh3_tmp) -
+                f_Smod_tmp * b_fh3_tmp / b_Smod_tmp;
+      vJ_tmp = b_Smod_tmp_tmp * b_fh3_tmp;
+      f_fh3_tmp = (d_fh3_tmp_tmp * f_del_tmp / 2.0 -
+                   3.0 * b_fh3_tmp * f_del_tmp / 2.0) +
+                  vJ_tmp;
+      g_fh3_tmp = 2.0 * c_fh3_tmp_tmp;
+      fh3[2] = ((fh3_tmp_tmp_tmp * b_a_tmp * i_Smod_tmp / k_Smod_tmp -
+                 l_Smod_tmp * f_fh3_tmp / k_Smod_tmp) +
+                del_tmp * fh3_tmp * i_Smod_tmp / k_Smod_tmp) -
+               5.0 * del_tmp * b_a_tmp * i_Smod_tmp * b_fh3_tmp / g_fh3_tmp;
+      fh3[8] = ((b_fh3_tmp_tmp_tmp * b_a_tmp * i_Smod_tmp / k_Smod_tmp -
+                 m_Smod_tmp * f_fh3_tmp / k_Smod_tmp) +
+                b_del_tmp * fh3_tmp * i_Smod_tmp / k_Smod_tmp) -
+               5.0 * b_del_tmp * b_a_tmp * i_Smod_tmp * b_fh3_tmp / g_fh3_tmp;
+      fh3[14] = d_fh3_tmp_tmp / (2.0 * e_del_tmp) - vJ_tmp / i_fh3_tmp;
+      fh3_tmp = c_g_tmp_tmp *
+                (b_fh3_tmp / e_fh3_tmp_tmp - d_fh3_tmp_tmp / e_fh3_tmp_tmp) /
+                n_Smod_tmp;
+      f_fh3_tmp = del_tmp * b_fh3_tmp_tmp_tmp * h_Smod_tmp_tmp / n_Smod_tmp;
+      g_fh3_tmp = fh3_tmp_tmp_tmp * b_del_tmp * h_Smod_tmp_tmp / n_Smod_tmp;
+      h_fh3_tmp = 3.0 * del_tmp * b_del_tmp * h_Smod_tmp_tmp * b_fh3_tmp /
+                  d_Smod_tmp_tmp;
+      fh3[3] = ((h_fh3_tmp - f_fh3_tmp) - g_fh3_tmp) - fh3_tmp;
+      fh3[9] = 3.0 * p_Smod_tmp * b_fh3_tmp / d_Smod_tmp_tmp -
+               (((d_del_tmp * b_fh3_tmp / e_fh3_tmp_tmp +
+                  b_fh3_tmp_tmp * f_del_tmp) +
+                 2.0 * r * del_tmp * fh3_tmp_tmp_tmp * b_g_tmp) +
+                e_Smod_tmp_tmp * b_fh3_tmp / e_fh3_tmp_tmp) /
+                   n_Smod_tmp;
+      fh3[15] = 0.0;
+      fh3[4] =
+          (((c_del_tmp * b_fh3_tmp / e_fh3_tmp_tmp + fh3_tmp_tmp * f_del_tmp) +
+            2.0 * r * b_del_tmp * b_fh3_tmp_tmp_tmp * b_g_tmp) +
+           g_Smod_tmp_tmp * b_fh3_tmp / e_fh3_tmp_tmp) /
+              n_Smod_tmp -
+          3.0 * q_Smod_tmp * b_fh3_tmp / d_Smod_tmp_tmp;
+      fh3[10] = ((fh3_tmp + f_fh3_tmp) + g_fh3_tmp) - h_fh3_tmp;
+      fh3[16] = 0.0;
+      fh3_tmp = 2.0 * r * c_Smod_tmp;
+      fh3[5] = (o_Smod_tmp * b_fh3_tmp / b_Smod_tmp -
+                b_fh3_tmp_tmp_tmp * (b_g_tmp_tmp - 1.0) / e_del_tmp) +
+               e_fh3_tmp / fh3_tmp;
+      fh3[11] = (fh3_tmp_tmp_tmp * (b_g_tmp_tmp - 1.0) / e_del_tmp -
+                 r_Smod_tmp * b_fh3_tmp / b_Smod_tmp) -
+                c_fh3_tmp / fh3_tmp;
+      fh3[17] = 0.0;
     }
-    PCC_jacobian(b_q, r, L0, b_qd, I_tmp, c_Xup, g, fh3);
-    memcpy(&(*(double(*)[18]) & Smod_data[18 * b_i])[0], &c_Xup[0],
-           18U * sizeof(double));
-    memcpy(&(*(double(*)[36]) & XJ_data[36 * (b_i + 1)])[0], &I_tmp[0],
-           36U * sizeof(double));
-    for (i = 0; i < 6; i++) {
-      for (i3 = 0; i3 < 6; i3++) {
-        d = 0.0;
-        for (j = 0; j < 6; j++) {
-          d +=
-              XJ_data[(i + 6 * j) + 36 * (b_i + 1)] * (double)Xtree[j + 6 * i3];
+    /*  convert transform to rotation and translation */
+    /*  Adjoint calculator */
+    /*  This function calculates the adjoint given simply the transform between
+     */
+    /*  joints */
+    /*  get skew symmetric matrix of translation */
+    for (b_i = 0; b_i < 3; b_i++) {
+      skw[3 * b_i] = g[b_i];
+      skw[3 * b_i + 1] = g[b_i + 4];
+      skw[3 * b_i + 2] = g[b_i + 8];
+    }
+    for (b_i = 0; b_i < 9; b_i++) {
+      b_skw[b_i] = -skw[b_i];
+    }
+    dv[3] = -g[14];
+    dv[6] = g[13];
+    dv[1] = g[14];
+    dv[7] = -g[12];
+    dv[2] = -g[13];
+    dv[5] = g[12];
+    for (b_i = 0; b_i < 3; b_i++) {
+      b_a = b_skw[b_i];
+      g_tmp_tmp = b_skw[b_i + 3];
+      a_tmp = b_skw[b_i + 6];
+      for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+        c_skw[b_i + 3 * b_XJ_tmp] =
+            (b_a * dv[3 * b_XJ_tmp] + g_tmp_tmp * dv[3 * b_XJ_tmp + 1]) +
+            a_tmp * dv[3 * b_XJ_tmp + 2];
+        XJ[(b_XJ_tmp + 6 * b_i) + 36 * (i + 1)] = skw[b_XJ_tmp + 3 * b_i];
+      }
+    }
+    XJ_tmp = 36 * (i + 1);
+    for (b_i = 0; b_i < 3; b_i++) {
+      b_XJ_tmp = 6 * (b_i + 3) + XJ_tmp;
+      XJ[b_XJ_tmp] = c_skw[3 * b_i];
+      c_XJ_tmp = 6 * b_i + XJ_tmp;
+      XJ[c_XJ_tmp + 3] = 0.0;
+      XJ[b_XJ_tmp + 3] = skw[3 * b_i];
+      j = 3 * b_i + 1;
+      XJ[b_XJ_tmp + 1] = c_skw[j];
+      XJ[c_XJ_tmp + 4] = 0.0;
+      XJ[b_XJ_tmp + 4] = skw[j];
+      j = 3 * b_i + 2;
+      XJ[b_XJ_tmp + 2] = c_skw[j];
+      XJ[c_XJ_tmp + 5] = 0.0;
+      XJ[b_XJ_tmp + 5] = skw[j];
+    }
+    for (b_i = 0; b_i < 6; b_i++) {
+      for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+        b_a = 0.0;
+        for (i1 = 0; i1 < 6; i1++) {
+          b_a += XJ[(b_i + 6 * i1) + 36 * (i + 1)] *
+                 (double)Xtree[i1 + 6 * b_XJ_tmp];
         }
-        Xup_data[(i + 6 * i3) + 36 * (b_i + 1)] = d;
-      }
-      for (i3 = 0; i3 < 6; i3++) {
-        d = 0.0;
-        for (j = 0; j < 6; j++) {
-          d += Xup_data[(i + 6 * j) + 36 * (b_i + 1)] * X[j + 6 * i3];
-        }
-        I_tmp[i + 6 * i3] = d;
+        Xup[(b_i + 6 * b_XJ_tmp) + 36 * (i + 1)] = b_a;
       }
     }
-    for (i = 0; i < 36; i++) {
-      X[i] = I_tmp[i];
-      Xtree[i] = 0;
+    for (b_i = 0; b_i < 36; b_i++) {
+      Xtree[b_i] = 0;
     }
-    for (loop_ub_tmp = 0; loop_ub_tmp < 6; loop_ub_tmp++) {
-      Xtree[loop_ub_tmp + 6 * loop_ub_tmp] = 1;
+    g_tmp = qd[qi_data[0] - 1];
+    d_Smod_tmp_tmp = qd[qi_data[1] - 1];
+    d_fh3_tmp = qd[qi_data[2] - 1];
+    for (XJ_tmp = 0; XJ_tmp < 6; XJ_tmp++) {
+      Xtree[XJ_tmp + 6 * XJ_tmp] = 1;
+      b_i = XJ_tmp + 18 * i;
+      b_a = (Smod[b_i] * g_tmp + Smod[b_i + 6] * d_Smod_tmp_tmp) +
+            Smod[b_i + 12] * d_fh3_tmp;
+      vJ[XJ_tmp] = b_a;
+      g_tmp_tmp = 0.0;
+      for (b_i = 0; b_i < 6; b_i++) {
+        g_tmp_tmp += Xup[(XJ_tmp + 6 * b_i) + 36 * (i + 1)] * b_v[b_i + 6 * i];
+      }
+      b_Xup[XJ_tmp] = g_tmp_tmp + b_a;
     }
-    qd_tmp = qd[(int)qi_data[0] - 1];
-    b_qd_tmp = qd[(int)qi_data[1] - 1];
-    c_qd_tmp = qd[(int)qi_data[2] - 1];
-    for (i = 0; i < 6; i++) {
-      i3 = i + 18 * b_i;
-      d = (Smod_data[i3] * qd_tmp + Smod_data[i3 + 6] * b_qd_tmp) +
-          Smod_data[i3 + 12] * c_qd_tmp;
-      vJ[i] = d;
+    for (b_i = 0; b_i < 6; b_i++) {
+      b_v[b_i + 6 * (i + 1)] = b_Xup[b_i];
+    }
+    memset(&I_tmp[0], 0, 36U * sizeof(double));
+    skw[0] = 0.0;
+    b_i = 6 * (i + 1);
+    b_a = b_v[b_i + 5];
+    skw[3] = -b_a;
+    g_tmp_tmp = b_v[b_i + 4];
+    skw[6] = g_tmp_tmp;
+    skw[1] = b_a;
+    skw[4] = 0.0;
+    a_tmp = b_v[b_i + 3];
+    skw[7] = -a_tmp;
+    skw[2] = -g_tmp_tmp;
+    skw[5] = a_tmp;
+    skw[8] = 0.0;
+    for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+      vJ_tmp = skw[3 * b_XJ_tmp];
+      I_tmp[6 * b_XJ_tmp] = vJ_tmp;
+      XJ_tmp = 6 * (b_XJ_tmp + 3);
+      I_tmp[XJ_tmp + 3] = vJ_tmp;
+      vJ_tmp = skw[3 * b_XJ_tmp + 1];
+      I_tmp[6 * b_XJ_tmp + 1] = vJ_tmp;
+      I_tmp[XJ_tmp + 4] = vJ_tmp;
+      vJ_tmp = skw[3 * b_XJ_tmp + 2];
+      I_tmp[6 * b_XJ_tmp + 2] = vJ_tmp;
+      I_tmp[XJ_tmp + 5] = vJ_tmp;
+    }
+    I_tmp[18] = 0.0;
+    n_fh3_tmp = b_v[b_i + 2];
+    I_tmp[24] = -n_fh3_tmp;
+    o_fh3_tmp = b_v[b_i + 1];
+    I_tmp[30] = o_fh3_tmp;
+    I_tmp[19] = n_fh3_tmp;
+    I_tmp[25] = 0.0;
+    p_fh3_tmp = b_v[b_i];
+    I_tmp[31] = -p_fh3_tmp;
+    I_tmp[20] = -o_fh3_tmp;
+    I_tmp[26] = p_fh3_tmp;
+    I_tmp[32] = 0.0;
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
       vJ_tmp = 0.0;
-      for (i3 = 0; i3 < 6; i3++) {
-        vJ_tmp +=
-            Xup_data[(i + 6 * i3) + 36 * (b_i + 1)] * v_data[i3 + 6 * b_i];
+      for (i1 = 0; i1 < 6; i1++) {
+        vJ_tmp += Xup[(b_XJ_tmp + 6 * i1) + 36 * (i + 1)] * a[i1 + 6 * i];
       }
-      b_Xup[i] = vJ_tmp + d;
+      b_Xup[b_XJ_tmp] = vJ_tmp;
+      c_I[b_XJ_tmp] =
+          (fh3[b_XJ_tmp] * g_tmp + fh3[b_XJ_tmp + 6] * d_Smod_tmp_tmp) +
+          fh3[b_XJ_tmp + 12] * d_fh3_tmp;
     }
-    for (i = 0; i < 6; i++) {
-      v_data[i + 6 * (b_i + 1)] = b_Xup[i];
-    }
-    memset(&I_tmp[0], 0, 36U * sizeof(double));
-    skw[0] = 0.0;
-    i = 6 * (b_i + 1);
-    d = v_data[i + 5];
-    skw[3] = -d;
-    vJ_tmp = v_data[i + 4];
-    skw[6] = vJ_tmp;
-    skw[1] = d;
-    skw[4] = 0.0;
-    d1 = v_data[i + 3];
-    skw[7] = -d1;
-    skw[2] = -vJ_tmp;
-    skw[5] = d1;
-    skw[8] = 0.0;
-    for (i3 = 0; i3 < 3; i3++) {
-      vJ_tmp_tmp = skw[3 * i3];
-      I_tmp[6 * i3] = vJ_tmp_tmp;
-      loop_ub_tmp = 6 * (i3 + 3);
-      I_tmp[loop_ub_tmp + 3] = vJ_tmp_tmp;
-      vJ_tmp_tmp = skw[3 * i3 + 1];
-      I_tmp[6 * i3 + 1] = vJ_tmp_tmp;
-      I_tmp[loop_ub_tmp + 4] = vJ_tmp_tmp;
-      vJ_tmp_tmp = skw[3 * i3 + 2];
-      I_tmp[6 * i3 + 2] = vJ_tmp_tmp;
-      I_tmp[loop_ub_tmp + 5] = vJ_tmp_tmp;
-    }
-    I_tmp[18] = 0.0;
-    d2 = v_data[i + 2];
-    I_tmp[24] = -d2;
-    d3 = v_data[i + 1];
-    I_tmp[30] = d3;
-    I_tmp[19] = d2;
-    I_tmp[25] = 0.0;
-    d4 = v_data[i];
-    I_tmp[31] = -d4;
-    I_tmp[20] = -d3;
-    I_tmp[26] = d4;
-    I_tmp[32] = 0.0;
-    for (i3 = 0; i3 < 6; i3++) {
-      vJ_tmp_tmp = 0.0;
-      for (j = 0; j < 6; j++) {
-        vJ_tmp_tmp +=
-            Xup_data[(i3 + 6 * j) + 36 * (b_i + 1)] * a_data[j + 6 * b_i];
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+      vJ_tmp = 0.0;
+      for (i1 = 0; i1 < 6; i1++) {
+        vJ_tmp += I_tmp[b_XJ_tmp + 6 * i1] * vJ[i1];
       }
-      b_Xup[i3] = vJ_tmp_tmp;
-      c_I[i3] =
-          (fh3[i3] * qd_tmp + fh3[i3 + 6] * b_qd_tmp) + fh3[i3 + 12] * c_qd_tmp;
-    }
-    for (i3 = 0; i3 < 6; i3++) {
-      vJ_tmp_tmp = 0.0;
-      for (j = 0; j < 6; j++) {
-        vJ_tmp_tmp += I_tmp[i3 + 6 * j] * vJ[j];
-      }
-      a_data[i3 + i] = (b_Xup[i3] + c_I[i3]) + vJ_tmp_tmp;
+      a[b_XJ_tmp + b_i] = (b_Xup[b_XJ_tmp] + c_I[b_XJ_tmp]) + vJ_tmp;
     }
     memset(&I_tmp[0], 0, 36U * sizeof(double));
     skw[0] = 0.0;
-    skw[3] = -d;
-    skw[6] = vJ_tmp;
-    skw[1] = d;
+    skw[3] = -b_a;
+    skw[6] = g_tmp_tmp;
+    skw[1] = b_a;
     skw[4] = 0.0;
-    skw[7] = -d1;
-    skw[2] = -vJ_tmp;
-    skw[5] = d1;
+    skw[7] = -a_tmp;
+    skw[2] = -g_tmp_tmp;
+    skw[5] = a_tmp;
     skw[8] = 0.0;
-    for (i3 = 0; i3 < 3; i3++) {
-      vJ_tmp_tmp = skw[3 * i3];
-      I_tmp[6 * i3] = vJ_tmp_tmp;
-      loop_ub_tmp = 6 * (i3 + 3);
-      I_tmp[loop_ub_tmp + 3] = vJ_tmp_tmp;
-      vJ_tmp_tmp = skw[3 * i3 + 1];
-      I_tmp[6 * i3 + 1] = vJ_tmp_tmp;
-      I_tmp[loop_ub_tmp + 4] = vJ_tmp_tmp;
-      vJ_tmp_tmp = skw[3 * i3 + 2];
-      I_tmp[6 * i3 + 2] = vJ_tmp_tmp;
-      I_tmp[loop_ub_tmp + 5] = vJ_tmp_tmp;
+    for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+      vJ_tmp = skw[3 * b_XJ_tmp];
+      I_tmp[6 * b_XJ_tmp] = vJ_tmp;
+      XJ_tmp = 6 * (b_XJ_tmp + 3);
+      I_tmp[XJ_tmp + 3] = vJ_tmp;
+      vJ_tmp = skw[3 * b_XJ_tmp + 1];
+      I_tmp[6 * b_XJ_tmp + 1] = vJ_tmp;
+      I_tmp[XJ_tmp + 4] = vJ_tmp;
+      vJ_tmp = skw[3 * b_XJ_tmp + 2];
+      I_tmp[6 * b_XJ_tmp + 2] = vJ_tmp;
+      I_tmp[XJ_tmp + 5] = vJ_tmp;
     }
     I_tmp[18] = 0.0;
-    I_tmp[24] = -d2;
-    I_tmp[30] = d3;
-    I_tmp[19] = d2;
+    I_tmp[24] = -n_fh3_tmp;
+    I_tmp[30] = o_fh3_tmp;
+    I_tmp[19] = n_fh3_tmp;
     I_tmp[25] = 0.0;
-    I_tmp[31] = -d4;
-    I_tmp[20] = -d3;
-    I_tmp[26] = d4;
+    I_tmp[31] = -p_fh3_tmp;
+    I_tmp[20] = -o_fh3_tmp;
+    I_tmp[26] = p_fh3_tmp;
     I_tmp[32] = 0.0;
-    for (i3 = 0; i3 < 6; i3++) {
-      for (j = 0; j < 6; j++) {
-        b_I_tmp[j + 6 * i3] = -I_tmp[i3 + 6 * j];
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+      for (i1 = 0; i1 < 6; i1++) {
+        b_I_tmp[i1 + 6 * b_XJ_tmp] = -I_tmp[b_XJ_tmp + 6 * i1];
       }
     }
-    for (i3 = 0; i3 < 6; i3++) {
-      c_I[i3] = 0.0;
-      vJ[i3] = 0.0;
-      for (j = 0; j < 6; j++) {
-        d = 0.0;
-        for (loop_ub_tmp = 0; loop_ub_tmp < 6; loop_ub_tmp++) {
-          d += b_I_tmp[i3 + 6 * loop_ub_tmp] *
-               I_data[(loop_ub_tmp + 6 * j) + 36 * (b_i + 1)];
+    for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+      c_I[b_XJ_tmp] = 0.0;
+      vJ[b_XJ_tmp] = 0.0;
+      for (i1 = 0; i1 < 6; i1++) {
+        b_a = 0.0;
+        for (XJ_tmp = 0; XJ_tmp < 6; XJ_tmp++) {
+          b_a += b_I_tmp[b_XJ_tmp + 6 * XJ_tmp] *
+                 b_I[(XJ_tmp + 6 * i1) + 36 * (i + 1)];
         }
-        loop_ub_tmp = j + i;
-        c_I[i3] += I_data[(i3 + 6 * j) + 36 * (b_i + 1)] * a_data[loop_ub_tmp];
-        vJ[i3] += d * v_data[loop_ub_tmp];
+        XJ_tmp = i1 + b_i;
+        c_I[b_XJ_tmp] += b_I[(b_XJ_tmp + 6 * i1) + 36 * (i + 1)] * a[XJ_tmp];
+        vJ[b_XJ_tmp] += b_a * b_v[XJ_tmp];
       }
-      f_data[i3 + i] = c_I[i3] + vJ[i3];
-    }
-  }
-  emxFree_real_T(&a);
-  emxFree_real_T(&b_v);
-  i = (int)-((-1.0 - N) + 1.0);
-  emxInit_int32_T(&b_r, 1);
-  for (b_i = 0; b_i < i; b_i++) {
-    vJ_tmp = N - (double)b_i;
-    if (vJ_tmp == 1.0) {
-      vJ_tmp_tmp = 0.0;
-      for (i2 = 0; i2 < 6; i2++) {
-        vJ_tmp_tmp += (double)c_a[i2] * f_data[i2];
-      }
-      C_data[0] = vJ_tmp_tmp;
-      for (i2 = 0; i2 < 6; i2++) {
-        d = 0.0;
-        for (i3 = 0; i3 < 6; i3++) {
-          d += X[i2 + 6 * i3] * (double)b_a[i3];
-        }
-        J_data[i2] = d;
-      }
-    } else {
-      vJ_tmp_tmp = (vJ_tmp - 2.0) * 3.0;
-      if (vJ_tmp_tmp + 4.0 < vJ_tmp_tmp + 2.0) {
-        qi->size[0] = 1;
-        qi->size[1] = 0;
-      } else if ((rtIsInf(vJ_tmp_tmp + 2.0) || rtIsInf(vJ_tmp_tmp + 4.0)) &&
-                 (vJ_tmp_tmp + 2.0 == vJ_tmp_tmp + 4.0)) {
-        i2 = qi->size[0] * qi->size[1];
-        qi->size[0] = 1;
-        qi->size[1] = 1;
-        emxEnsureCapacity_real_T(qi, i2);
-        qi_data = qi->data;
-        qi_data[0] = rtNaN;
-      } else {
-        i2 = qi->size[0] * qi->size[1];
-        qi->size[0] = 1;
-        j = (int)((vJ_tmp_tmp + 4.0) - (vJ_tmp_tmp + 2.0));
-        qi->size[1] = j + 1;
-        emxEnsureCapacity_real_T(qi, i2);
-        qi_data = qi->data;
-        for (i2 = 0; i2 <= j; i2++) {
-          qi_data[i2] = (vJ_tmp_tmp + 2.0) + (double)i2;
-        }
-      }
-      i2 = b_q->size[0];
-      b_q->size[0] = qi->size[1];
-      emxEnsureCapacity_real_T(b_q, i2);
-      q_data = b_q->data;
-      j = qi->size[1];
-      for (i2 = 0; i2 < j; i2++) {
-        q_data[i2] = qi_data[i2];
-      }
-      i2 = b_r->size[0];
-      b_r->size[0] = b_q->size[0];
-      emxEnsureCapacity_int32_T(b_r, i2);
-      r2 = b_r->data;
-      j = b_q->size[0];
-      for (i2 = 0; i2 < j; i2++) {
-        r2[i2] = (int)q_data[i2] - 1;
-      }
-      for (i2 = 0; i2 < 3; i2++) {
-        d = 0.0;
-        for (i3 = 0; i3 < 6; i3++) {
-          d += 2.0 * Smod_data[(i3 + 6 * i2) + 18 * ((int)vJ_tmp - 2)] *
-               f_data[i3 + 6 * ((int)vJ_tmp - 1)];
-        }
-        c_qd[i2] = d;
-      }
-      j = b_r->size[0];
-      for (i2 = 0; i2 < j; i2++) {
-        C_data[r2[i2]] = c_qd[i2];
-      }
-      for (i2 = 0; i2 < 6; i2++) {
-        d = 0.0;
-        for (i3 = 0; i3 < 6; i3++) {
-          d += Xup_data[(i3 + 6 * i2) + 36 * ((int)vJ_tmp - 1)] *
-               f_data[i3 + 6 * ((int)vJ_tmp - 1)];
-        }
-        c_I[i2] = f_data[i2 + 6 * ((int)vJ_tmp - 2)] + d;
-      }
-      for (i2 = 0; i2 < 6; i2++) {
-        f_data[i2 + 6 * ((int)vJ_tmp - 2)] = c_I[i2];
-      }
-      i2 = b_r->size[0];
-      b_r->size[0] = b_q->size[0];
-      emxEnsureCapacity_int32_T(b_r, i2);
-      r2 = b_r->data;
-      j = b_q->size[0];
-      for (i2 = 0; i2 < j; i2++) {
-        r2[i2] = (int)q_data[i2] - 1;
-      }
-      for (i2 = 0; i2 < 6; i2++) {
-        for (i3 = 0; i3 < 3; i3++) {
-          d = 0.0;
-          for (j = 0; j < 6; j++) {
-            d += X[i2 + 6 * j] *
-                 Smod_data[(j + 6 * i3) + 18 * ((int)vJ_tmp - 2)];
-          }
-          fh3[i2 + 6 * i3] = d;
-        }
-      }
-      j = b_r->size[0];
-      for (i2 = 0; i2 < j; i2++) {
-        for (i3 = 0; i3 < 6; i3++) {
-          J_data[i3 + 6 * r2[i2]] = fh3[i3 + 6 * i2];
-        }
-      }
-      for (i2 = 0; i2 < 6; i2++) {
-        for (i3 = 0; i3 < 6; i3++) {
-          d = 0.0;
-          for (j = 0; j < 6; j++) {
-            d += X[i2 + 6 * j] * XJ_data[(j + 6 * i3) + 36 * ((int)vJ_tmp - 1)];
-          }
-          I_tmp[i2 + 6 * i3] = d;
-        }
-        for (i3 = 0; i3 < 6; i3++) {
-          d = 0.0;
-          for (j = 0; j < 6; j++) {
-            d += I_tmp[i2 + 6 * j] * (double)Xtree[j + 6 * i3];
-          }
-          X[i2 + 6 * i3] = d;
-        }
-      }
+      f[b_XJ_tmp + b_i] = c_I[b_XJ_tmp] + vJ[b_XJ_tmp];
     }
   }
-  emxFree_real_T(&f);
-  emxFree_real_T(&XJ);
   /*  Composite Rigid Body Algorithm to calculate M */
   /*  composite inertia calculation */
-  for (b_i = 0; b_i < i; b_i++) {
-    vJ_tmp = N - (double)b_i;
-    if (vJ_tmp != 1.0) {
-      i2 = 36 * ((int)vJ_tmp - 1);
-      for (i3 = 0; i3 < 6; i3++) {
-        for (j = 0; j < 6; j++) {
-          d = 0.0;
-          for (loop_ub_tmp = 0; loop_ub_tmp < 6; loop_ub_tmp++) {
-            d += Xup_data[(loop_ub_tmp + 6 * i3) + i2] *
-                 I_data[(loop_ub_tmp + 6 * j) + i2];
-          }
-          I_tmp[i3 + 6 * j] = d;
-        }
-        for (j = 0; j < 6; j++) {
-          d = 0.0;
-          for (loop_ub_tmp = 0; loop_ub_tmp < 6; loop_ub_tmp++) {
-            d += I_tmp[i3 + 6 * loop_ub_tmp] *
-                 Xup_data[(loop_ub_tmp + 6 * j) + 36 * ((int)vJ_tmp - 1)];
-          }
-          loop_ub_tmp = i3 + 6 * j;
-          b_I_tmp[loop_ub_tmp] =
-              I_data[loop_ub_tmp + 36 * ((int)vJ_tmp - 2)] + d;
-        }
+  for (i = 0; i < 4; i++) {
+    if (4 - i == 1) {
+      b_a = 0.0;
+      for (b_i = 0; b_i < 6; b_i++) {
+        b_a += (double)d_a[b_i] * f[b_i];
       }
-      for (i2 = 0; i2 < 6; i2++) {
-        for (i3 = 0; i3 < 6; i3++) {
-          j = i3 + 6 * i2;
-          I_data[j + 36 * ((int)vJ_tmp - 2)] = b_I_tmp[j];
+      C[0] = b_a;
+    } else {
+      XJ_tmp = (2 - i) * 3;
+      for (b_i = 0; b_i < 3; b_i++) {
+        qi_data[b_i] = (signed char)((XJ_tmp + b_i) + 2);
+      }
+      for (b_i = 0; b_i < 3; b_i++) {
+        tmp_data[b_i] = (signed char)(qi_data[b_i] - 1);
+      }
+      for (b_i = 0; b_i < 3; b_i++) {
+        b_a = 0.0;
+        for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+          b_a += 2.0 * Smod[(b_XJ_tmp + 6 * b_i) + 18 * (2 - i)] *
+                 f[b_XJ_tmp + 6 * (3 - i)];
         }
+        b_qd[b_i] = b_a;
+      }
+      for (b_i = 0; b_i < 3; b_i++) {
+        C[tmp_data[b_i]] = b_qd[b_i];
+      }
+      for (b_i = 0; b_i < 6; b_i++) {
+        b_a = 0.0;
+        for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+          b_a += Xup[(b_XJ_tmp + 6 * b_i) + 36 * (3 - i)] *
+                 f[b_XJ_tmp + 6 * (3 - i)];
+        }
+        c_I[b_i] = f[b_i + 6 * (2 - i)] + b_a;
+      }
+      for (b_i = 0; b_i < 6; b_i++) {
+        f[b_i + 6 * (2 - i)] = c_I[b_i];
       }
     }
+    if (4 - i != 1) {
+      b_i = 36 * (3 - i);
+      for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+        for (i1 = 0; i1 < 6; i1++) {
+          b_a = 0.0;
+          for (XJ_tmp = 0; XJ_tmp < 6; XJ_tmp++) {
+            b_a += Xup[(XJ_tmp + 6 * b_XJ_tmp) + b_i] *
+                   b_I[(XJ_tmp + 6 * i1) + b_i];
+          }
+          I_tmp[b_XJ_tmp + 6 * i1] = b_a;
+        }
+        for (i1 = 0; i1 < 6; i1++) {
+          b_a = 0.0;
+          for (XJ_tmp = 0; XJ_tmp < 6; XJ_tmp++) {
+            b_a += I_tmp[b_XJ_tmp + 6 * XJ_tmp] *
+                   Xup[(XJ_tmp + 6 * i1) + 36 * (3 - i)];
+          }
+          XJ_tmp = b_XJ_tmp + 6 * i1;
+          b_I_tmp[XJ_tmp] = b_I[XJ_tmp + 36 * (2 - i)] + b_a;
+        }
+      }
+      memcpy(&b_I[i * -36 + 72], &b_I_tmp[0], 36U * sizeof(double));
+    }
   }
-  i = M->size[0] * M->size[1];
-  M->size[0] = (int)Nq_tmp;
-  M->size[1] = (int)Nq_tmp;
-  emxEnsureCapacity_real_T(M, i);
-  XJ_data = M->data;
-  j = (int)Nq_tmp * (int)Nq_tmp;
-  for (i = 0; i < j; i++) {
-    XJ_data[i] = 0.0;
-  }
+  memset(&M[0], 0, 100U * sizeof(double));
   /*  fh3 = zeros(6,3); */
   /*  fh1 = zeros(6,1); */
-  emxInit_int32_T(&r1, 1);
-  for (b_i = 0; b_i < i1; b_i++) {
-    if ((unsigned int)b_i + 1U == 1U) {
-      d = 0.0;
-      for (i = 0; i < 6; i++) {
-        vJ_tmp = 0.0;
-        for (i2 = 0; i2 < 6; i2++) {
-          vJ_tmp += I_data[i + 6 * i2] * (double)b_a[i2];
+  for (i = 0; i < 4; i++) {
+    if (i + 1 == 1) {
+      b_a = 0.0;
+      for (b_i = 0; b_i < 6; b_i++) {
+        g_tmp_tmp = 0.0;
+        for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+          g_tmp_tmp += b_I[b_i + 6 * b_XJ_tmp] * (double)c_a[b_XJ_tmp];
         }
-        d += (double)iv1[i] * vJ_tmp;
+        b_a += (double)iv[b_i] * g_tmp_tmp;
       }
-      XJ_data[0] = d;
+      M[0] = b_a;
     } else {
-      unsigned int b_j;
-      vJ_tmp_tmp = (((double)b_i + 1.0) - 2.0) * 3.0;
-      if (vJ_tmp_tmp + 4.0 < vJ_tmp_tmp + 2.0) {
-        qi->size[0] = 1;
-        qi->size[1] = 0;
-      } else {
-        i = qi->size[0] * qi->size[1];
-        qi->size[0] = 1;
-        j = (int)((vJ_tmp_tmp + 4.0) - (vJ_tmp_tmp + 2.0));
-        qi->size[1] = j + 1;
-        emxEnsureCapacity_real_T(qi, i);
-        qi_data = qi->data;
-        for (i = 0; i <= j; i++) {
-          qi_data[i] = (vJ_tmp_tmp + 2.0) + (double)i;
-        }
+      signed char b_tmp_data[9];
+      XJ_tmp = (i - 1) * 3;
+      for (b_i = 0; b_i < 3; b_i++) {
+        qi_data[b_i] = (signed char)((XJ_tmp + b_i) + 2);
       }
-      for (i = 0; i < 6; i++) {
-        for (i2 = 0; i2 < 3; i2++) {
-          d = 0.0;
-          for (i3 = 0; i3 < 6; i3++) {
-            d += I_data[(i + 6 * i3) + 36 * b_i] *
-                 Smod_data[(i3 + 6 * i2) + 18 * (b_i - 1)];
+      for (b_i = 0; b_i < 6; b_i++) {
+        for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+          b_a = 0.0;
+          for (i1 = 0; i1 < 6; i1++) {
+            b_a += b_I[(b_i + 6 * i1) + 36 * i] *
+                   Smod[(i1 + 6 * b_XJ_tmp) + 18 * (i - 1)];
           }
-          fh3[i + 6 * i2] = d;
+          fh3[b_i + 6 * b_XJ_tmp] = b_a;
         }
       }
-      i = b_q->size[0];
-      b_q->size[0] = qi->size[1];
-      emxEnsureCapacity_real_T(b_q, i);
-      q_data = b_q->data;
-      j = qi->size[1];
-      for (i = 0; i < j; i++) {
-        q_data[i] = qi_data[i];
+      for (b_i = 0; b_i < 3; b_i++) {
+        b_XJ_tmp = qi_data[b_i];
+        tmp_data[b_i] = (signed char)(b_XJ_tmp - 1);
+        b_tmp_data[b_i] = (signed char)(b_XJ_tmp - 1);
       }
-      i = b_r->size[0];
-      b_r->size[0] = b_q->size[0];
-      emxEnsureCapacity_int32_T(b_r, i);
-      r2 = b_r->data;
-      j = b_q->size[0];
-      i = r1->size[0];
-      r1->size[0] = b_q->size[0];
-      emxEnsureCapacity_int32_T(r1, i);
-      r3 = r1->data;
-      for (i = 0; i < j; i++) {
-        i2 = (int)q_data[i] - 1;
-        r2[i] = i2;
-        r3[i] = i2;
-      }
-      for (i = 0; i < 3; i++) {
-        for (i2 = 0; i2 < 3; i2++) {
-          d = 0.0;
-          for (i3 = 0; i3 < 6; i3++) {
-            d += Smod_data[(i3 + 6 * i) + 18 * (b_i - 1)] * fh3[i3 + 6 * i2];
+      for (b_i = 0; b_i < 3; b_i++) {
+        for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+          b_a = 0.0;
+          for (i1 = 0; i1 < 6; i1++) {
+            b_a += Smod[(i1 + 6 * b_i) + 18 * (i - 1)] * fh3[i1 + 6 * b_XJ_tmp];
           }
-          skw[i + 3 * i2] = d;
+          skw[b_i + 3 * b_XJ_tmp] = b_a;
         }
       }
-      loop_ub_tmp = b_r->size[0];
-      j = r1->size[0];
-      for (i = 0; i < j; i++) {
-        for (i2 = 0; i2 < loop_ub_tmp; i2++) {
-          XJ_data[r2[i2] + M->size[0] * r3[i]] = skw[i2 + loop_ub_tmp * i];
+      for (b_i = 0; b_i < 3; b_i++) {
+        for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+          M[tmp_data[b_XJ_tmp] + 10 * b_tmp_data[b_i]] =
+              skw[b_XJ_tmp + 3 * b_i];
         }
       }
-      b_j = (unsigned int)b_i + 1U;
-      while ((b_j < N + 1.0) && (b_j > 1U)) {
-        for (i = 0; i < 6; i++) {
-          for (i2 = 0; i2 < 3; i2++) {
-            d = 0.0;
-            for (i3 = 0; i3 < 6; i3++) {
-              d += Xup_data[(i3 + 6 * i) + 36 * ((int)b_j - 1)] *
-                   fh3[i3 + 6 * i2];
+      j = i - 1;
+      while (j + 2 > 1) {
+        for (b_i = 0; b_i < 6; b_i++) {
+          for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+            b_a = 0.0;
+            for (i1 = 0; i1 < 6; i1++) {
+              b_a +=
+                  Xup[(i1 + 6 * b_i) + 36 * (j + 1)] * fh3[i1 + 6 * b_XJ_tmp];
             }
-            c_Xup[i + 6 * i2] = d;
+            c_Xup[b_i + 6 * b_XJ_tmp] = b_a;
           }
         }
         memcpy(&fh3[0], &c_Xup[0], 18U * sizeof(double));
-        b_j = (unsigned int)((int)b_j - 1);
-        if ((int)b_j == 1) {
-          i = b_r->size[0];
-          b_r->size[0] = b_q->size[0];
-          emxEnsureCapacity_int32_T(b_r, i);
-          r2 = b_r->data;
-          j = b_q->size[0];
-          for (i = 0; i < j; i++) {
-            r2[i] = (int)q_data[i] - 1;
-          }
-          for (i = 0; i < 3; i++) {
-            d = 0.0;
-            for (i2 = 0; i2 < 6; i2++) {
-              d += fh3[i2 + 6 * i] * (double)b_a[i2];
+        j--;
+        if (j + 2 == 1) {
+          for (b_i = 0; b_i < 3; b_i++) {
+            b_a = 0.0;
+            for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+              b_a += fh3[b_XJ_tmp + 6 * b_i] * (double)c_a[b_XJ_tmp];
             }
-            c_qd[i] = d;
+            b_qd[b_i] = b_a;
           }
-          j = b_r->size[0];
-          for (i = 0; i < j; i++) {
-            XJ_data[r2[i]] = c_qd[i];
+          for (b_i = 0; b_i < 3; b_i++) {
+            M[b_tmp_data[b_i]] = b_qd[b_i];
           }
           /* (S{j}' * fh).'; */
-          i = b_r->size[0];
-          b_r->size[0] = b_q->size[0];
-          emxEnsureCapacity_int32_T(b_r, i);
-          r2 = b_r->data;
-          j = b_q->size[0];
-          for (i = 0; i < j; i++) {
-            r2[i] = (int)q_data[i] - 1;
-          }
-          for (i = 0; i < 3; i++) {
-            d = 0.0;
-            for (i2 = 0; i2 < 6; i2++) {
-              d += (double)iv1[i2] * fh3[i2 + 6 * i];
+          for (b_i = 0; b_i < 3; b_i++) {
+            b_a = 0.0;
+            for (b_XJ_tmp = 0; b_XJ_tmp < 6; b_XJ_tmp++) {
+              b_a += (double)iv[b_XJ_tmp] * fh3[b_XJ_tmp + 6 * b_i];
             }
-            c_qd[i] = d;
+            b_qd[b_i] = b_a;
           }
-          j = b_r->size[0];
-          for (i = 0; i < j; i++) {
-            XJ_data[M->size[0] * r2[i]] = c_qd[i];
+          for (b_i = 0; b_i < 3; b_i++) {
+            M[10 * b_tmp_data[b_i]] = b_qd[b_i];
           }
         } else {
-          vJ_tmp_tmp = ((double)b_j - 2.0) * 3.0;
-          if (vJ_tmp_tmp + 4.0 < vJ_tmp_tmp + 2.0) {
-            qi->size[0] = 1;
-            qi->size[1] = 0;
+          signed char c_tmp_data[6];
+          signed char d_tmp_data[6];
+          b_XJ_tmp = j * 3 + 2;
+          XJ_tmp = j * 3 + 4;
+          if (XJ_tmp < b_XJ_tmp) {
+            c_XJ_tmp = 0;
           } else {
-            i = qi->size[0] * qi->size[1];
-            qi->size[0] = 1;
-            j = (int)((vJ_tmp_tmp + 4.0) - (vJ_tmp_tmp + 2.0));
-            qi->size[1] = j + 1;
-            emxEnsureCapacity_real_T(qi, i);
-            qi_data = qi->data;
-            for (i = 0; i <= j; i++) {
-              qi_data[i] = (vJ_tmp_tmp + 2.0) + (double)i;
+            XJ_tmp = (signed char)XJ_tmp - (signed char)b_XJ_tmp;
+            c_XJ_tmp = XJ_tmp + 1;
+            for (b_i = 0; b_i <= XJ_tmp; b_i++) {
+              qi_data[b_i] =
+                  (signed char)((signed char)b_XJ_tmp + (signed char)b_i);
             }
           }
-          i = b_r->size[0];
-          b_r->size[0] = b_q->size[0];
-          emxEnsureCapacity_int32_T(b_r, i);
-          r2 = b_r->data;
-          j = b_q->size[0];
-          for (i = 0; i < j; i++) {
-            r2[i] = (int)q_data[i] - 1;
+          for (b_i = 0; b_i < c_XJ_tmp; b_i++) {
+            b_XJ_tmp = qi_data[b_i];
+            c_tmp_data[b_i] = (signed char)b_XJ_tmp;
+            d_tmp_data[b_i] = (signed char)(b_XJ_tmp - 1);
           }
-          i = b_qd->size[0];
-          b_qd->size[0] = qi->size[1];
-          emxEnsureCapacity_real_T(b_qd, i);
-          qd_data = b_qd->data;
-          j = qi->size[1];
-          for (i = 0; i < j; i++) {
-            qd_data[i] = qi_data[i];
-          }
-          i = r1->size[0];
-          r1->size[0] = b_qd->size[0];
-          emxEnsureCapacity_int32_T(r1, i);
-          r3 = r1->data;
-          j = b_qd->size[0];
-          for (i = 0; i < j; i++) {
-            r3[i] = (int)qd_data[i] - 1;
-          }
-          for (i = 0; i < 3; i++) {
-            for (i2 = 0; i2 < 3; i2++) {
-              d = 0.0;
-              for (i3 = 0; i3 < 6; i3++) {
-                d += fh3[i3 + 6 * i] *
-                     Smod_data[(i3 + 6 * i2) + 18 * ((int)b_j - 2)];
+          for (b_i = 0; b_i < 3; b_i++) {
+            for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+              b_a = 0.0;
+              for (i1 = 0; i1 < 6; i1++) {
+                b_a += fh3[i1 + 6 * b_i] * Smod[(i1 + 6 * b_XJ_tmp) + 18 * j];
               }
-              skw[i + 3 * i2] = d;
-            }
-          }
-          loop_ub_tmp = b_r->size[0];
-          j = r1->size[0];
-          for (i = 0; i < j; i++) {
-            for (i2 = 0; i2 < loop_ub_tmp; i2++) {
-              XJ_data[r2[i2] + M->size[0] * r3[i]] = skw[i2 + loop_ub_tmp * i];
+              skw[b_i + 3 * b_XJ_tmp] = b_a;
             }
           }
           /* (S{j}' * fh).'; */
-          i = b_r->size[0];
-          b_r->size[0] = b_qd->size[0];
-          emxEnsureCapacity_int32_T(b_r, i);
-          r2 = b_r->data;
-          j = b_qd->size[0];
-          for (i = 0; i < j; i++) {
-            r2[i] = (int)qd_data[i] - 1;
+          for (b_i = 0; b_i < c_XJ_tmp; b_i++) {
+            for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+              M[b_tmp_data[b_XJ_tmp] + 10 * d_tmp_data[b_i]] =
+                  skw[b_XJ_tmp + 3 * b_i];
+            }
+            d_tmp_data[b_i] = (signed char)(c_tmp_data[b_i] - 1);
           }
-          i = r1->size[0];
-          r1->size[0] = b_q->size[0];
-          emxEnsureCapacity_int32_T(r1, i);
-          r3 = r1->data;
-          j = b_q->size[0];
-          for (i = 0; i < j; i++) {
-            r3[i] = (int)q_data[i] - 1;
-          }
-          for (i = 0; i < 3; i++) {
-            for (i2 = 0; i2 < 3; i2++) {
-              d = 0.0;
-              for (i3 = 0; i3 < 6; i3++) {
-                d += Smod_data[(i3 + 6 * i) + 18 * ((int)b_j - 2)] *
-                     fh3[i3 + 6 * i2];
+          for (b_i = 0; b_i < 3; b_i++) {
+            for (b_XJ_tmp = 0; b_XJ_tmp < 3; b_XJ_tmp++) {
+              b_a = 0.0;
+              for (i1 = 0; i1 < 6; i1++) {
+                b_a += Smod[(i1 + 6 * b_i) + 18 * j] * fh3[i1 + 6 * b_XJ_tmp];
               }
-              skw[i + 3 * i2] = d;
+              skw[b_i + 3 * b_XJ_tmp] = b_a;
             }
           }
-          loop_ub_tmp = b_r->size[0];
-          j = r1->size[0];
-          for (i = 0; i < j; i++) {
-            for (i2 = 0; i2 < loop_ub_tmp; i2++) {
-              XJ_data[r2[i2] + M->size[0] * r3[i]] = skw[i2 + loop_ub_tmp * i];
+          for (b_i = 0; b_i < 3; b_i++) {
+            for (b_XJ_tmp = 0; b_XJ_tmp < c_XJ_tmp; b_XJ_tmp++) {
+              M[d_tmp_data[b_XJ_tmp] + 10 * b_tmp_data[b_i]] =
+                  skw[b_XJ_tmp + c_XJ_tmp * b_i];
             }
           }
         }
       }
     }
   }
-  emxFree_real_T(&b_qd);
-  emxFree_real_T(&b_q);
-  emxFree_int32_T(&b_r);
-  emxFree_int32_T(&r1);
-  emxFree_real_T(&qi);
-  emxFree_real_T(&Xup);
-  emxFree_real_T(&Smod);
-  emxFree_real_T(&b_I);
   /*   */
   /*  for i = 1:N */
   /*      if mod(i,2) == 0 */

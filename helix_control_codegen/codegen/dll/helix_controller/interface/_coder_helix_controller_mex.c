@@ -5,7 +5,7 @@
  * File: _coder_helix_controller_mex.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 17:40:15
+ * C/C++ source code generated on  : 28-Oct-2024 20:27:52
  */
 
 /* Include Files */
@@ -47,25 +47,25 @@ emlrtCTX mexFunctionCreateRootTLS(void)
  * Arguments    : int32_T nlhs
  *                mxArray *plhs[7]
  *                int32_T nrhs
- *                const mxArray *prhs[24]
+ *                const mxArray *prhs[23]
  * Return Type  : void
  */
 void unsafe_helix_controller_mexFunction(int32_T nlhs, mxArray *plhs[7],
-                                         int32_T nrhs, const mxArray *prhs[24])
+                                         int32_T nrhs, const mxArray *prhs[23])
 {
   emlrtStack st = {
       NULL, /* site */
       NULL, /* tls */
       NULL  /* prev */
   };
-  const mxArray *b_prhs[24];
+  const mxArray *b_prhs[23];
   const mxArray *outputs[7];
   int32_T i;
   int32_T i1;
   st.tls = emlrtRootTLSGlobal;
   /* Check for proper number of arguments. */
-  if (nrhs != 24) {
-    emlrtErrMsgIdAndTxt(&st, "EMLRT:runTime:WrongNumberOfInputs", 5, 12, 24, 4,
+  if (nrhs != 23) {
+    emlrtErrMsgIdAndTxt(&st, "EMLRT:runTime:WrongNumberOfInputs", 5, 12, 23, 4,
                         16, "helix_controller");
   }
   if (nlhs > 7) {
@@ -73,7 +73,7 @@ void unsafe_helix_controller_mexFunction(int32_T nlhs, mxArray *plhs[7],
                         "helix_controller");
   }
   /* Call the function. */
-  for (i = 0; i < 24; i++) {
+  for (i = 0; i < 23; i++) {
     b_prhs[i] = prhs[i];
   }
   helix_controller_api(b_prhs, nlhs, outputs);

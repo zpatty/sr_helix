@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2023a">
-  <configuration build-checksum="3954542806" file="/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.prj" location="/home/zach/git-repos/sr_helix/helix_control_codegen" name="helix_controller" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="535814779" file="/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.prj" location="/home/zach/git-repos/sr_helix/helix_control_codegen" name="helix_controller" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex />
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -11,15 +11,15 @@
       <var.SimdQueryHardwareVendor>Generic</var.SimdQueryHardwareVendor>
       <var.SimdQueryHardwareType>MATLAB Host Computer</var.SimdQueryHardwareType>
       <param.InstructionSetExtensionsAvailableInUI>true</param.InstructionSetExtensionsAvailableInUI>
-      <param.ResponsivenessChecks>true</param.ResponsivenessChecks>
-      <param.ExtrinsicCalls>true</param.ExtrinsicCalls>
-      <param.IntegrityChecks>true</param.IntegrityChecks>
+      <param.ResponsivenessChecks />
+      <param.ExtrinsicCalls />
+      <param.IntegrityChecks />
       <param.SaturateOnIntegerOverflow>true</param.SaturateOnIntegerOverflow>
       <param.EnableAutoParallelization>false</param.EnableAutoParallelization>
       <param.NumberOfCpuThreads>0</param.NumberOfCpuThreads>
       <param.OptimizeReductions>false</param.OptimizeReductions>
-      <param.SIMDAcceleration>option.SIMDAcceleration.Portable</param.SIMDAcceleration>
-      <param.GlobalDataSyncMethod>option.GlobalDataSyncMethod.SyncAlways</param.GlobalDataSyncMethod>
+      <param.SIMDAcceleration />
+      <param.GlobalDataSyncMethod />
       <param.EnableVariableSizing>true</param.EnableVariableSizing>
       <param.EnableDynamicMemoryAllocation>true</param.EnableDynamicMemoryAllocation>
       <param.DynamicMemoryAllocation>option.DynamicMemoryAllocation.Threshold</param.DynamicMemoryAllocation>
@@ -38,7 +38,7 @@
       <param.CodeFormattingTool>option.CodeFormattingTool.Auto</param.CodeFormattingTool>
       <param.ReservedNameArray />
       <param.CppStyleConst>true</param.CppStyleConst>
-      <param.EnableDebugging>false</param.EnableDebugging>
+      <param.EnableDebugging />
       <param.Verbosity>option.Verbosity.Info</param.Verbosity>
       <param.ReportPotentialDifferences>false</param.ReportPotentialDifferences>
       <param.GenerateReport>true</param.GenerateReport>
@@ -60,12 +60,12 @@
       <param.CustomSource />
       <param.CustomLibrary />
       <param.PostCodeGenCommand />
-      <param.mex.GenCodeOnly>false</param.mex.GenCodeOnly>
+      <param.mex.GenCodeOnly />
       <param.ConstantFoldingTimeout>40000</param.ConstantFoldingTimeout>
       <param.CompileTimeRecursionLimit>50</param.CompileTimeRecursionLimit>
       <param.EnableRuntimeRecursion>true</param.EnableRuntimeRecursion>
       <param.PreserveVariableNames>option.PreserveVariableNames.None</param.PreserveVariableNames>
-      <param.EchoExpressions>true</param.EchoExpressions>
+      <param.EchoExpressions />
       <param.InlineThreshold>10</param.InlineThreshold>
       <param.InlineThresholdMax>200</param.InlineThresholdMax>
       <param.InlineStackLimit>1000000</param.InlineStackLimit>
@@ -77,13 +77,13 @@
       <param.EnableOpenMP>true</param.EnableOpenMP>
       <param.InitFltsAndDblsToZero>true</param.InitFltsAndDblsToZero>
       <param.DefaultVariableInitialization>option.DefaultVariableInitialization.None</param.DefaultVariableInitialization>
-      <param.ConstantInputs>option.ConstantInputs.CheckValues</param.ConstantInputs>
+      <param.ConstantInputs />
       <param.EnableCRICodeCoverage>true</param.EnableCRICodeCoverage>
       <param.EnableAutoParallelizationReporting>true</param.EnableAutoParallelizationReporting>
       <param.CacheDynamicArrayDataPointer>true</param.CacheDynamicArrayDataPointer>
       <param.EnableJIT>false</param.EnableJIT>
       <param.EnableJITSilentBailOut />
-      <param.CheckForIssuesJIT>true</param.CheckForIssuesJIT>
+      <param.CheckForIssuesJIT />
       <param.EnableGitSupport>false</param.EnableGitSupport>
       <param.EnableAutoCommit>true</param.EnableAutoCommit>
       <param.RepositoryStyle>option.RepositoryStyle.Auto</param.RepositoryStyle>
@@ -627,12 +627,12 @@
     <param.hdlParamStorage />
     <var.gc.lastOutputRoot>codegen/dll/helix_controller</var.gc.lastOutputRoot>
     <var.gc.lastOutputType>SHARED_LIBRARY</var.gc.lastOutputType>
-    <var.gc.preBuildChecksum>3954542806</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>3249695327</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen/mex/helix_controller</var.cfi.lastOutputRoot>
     <var.cfi.preBuildChecksum>3535260945</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>[tau, tau_r, x, M, C, A, cq] = helix_controller(q0,dq0,q0,q0,q0,d,m,r,kb,ks,bb,bs,bm,L0,Kp,KD,Kpx, KDx, xd, dxd, dxr, conv_pcc,conv_motor);</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/spatial_cross.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;3470915525&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/spatial_cross.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;1719311083&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/J_r.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/MC_3_cg.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/PCC_jacobian.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/adj_calc.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/helix_controller.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/skew.m&lt;/file&gt;&lt;file&gt;/home/zach/git-repos/sr_helix/helix_control_codegen/spatial_cross.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.NoDefaultJIT>false</param.NoDefaultJIT>

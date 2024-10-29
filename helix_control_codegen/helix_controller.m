@@ -42,7 +42,7 @@ for i = 1:N-1
     -d*cosd(30) d*cosd(30) 0;
     1 1 1];
     if i == 2
-        Al = [cosd(90) -sind(90) 0; sind(90) cosd(90) 0; 0 0 1]*Al;
+        Al = [cosd(180) -sind(180) 0; sind(180) cosd(180) 0; 0 0 1]*Al;
     % else
     %     Al = [-d d*cosd(30) d*cosd(30); 0 d*sind(30) -d*sind(30); 1 1 1];
     end

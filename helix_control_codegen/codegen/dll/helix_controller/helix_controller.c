@@ -5,7 +5,7 @@
  * File: helix_controller.c
  *
  * MATLAB Coder version            : 23.2
- * C/C++ source code generated on  : 28-Oct-2024 23:34:49
+ * C/C++ source code generated on  : 29-Oct-2024 18:41:09
  */
 
 /* Include Files */
@@ -74,7 +74,7 @@ void helix_controller(const double q[10], const double dq[10],
                                 0.0,
                                 1.0};
   static const signed char b[9] = {-1, 0, 0, 0, -1, 0, 0, 0, -1};
-  static const signed char c_a[9] = {0, 1, 0, -1, 0, 0, 0, 0, 1};
+  static const signed char c_a[9] = {-1, 0, 0, 0, -1, 0, 0, 0, 1};
   static const signed char iv[9] = {0, 1, 0, -1, 0, 0, 0, 0, 1};
   double D[100];
   double K[100];

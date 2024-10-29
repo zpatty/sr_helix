@@ -56,12 +56,12 @@ class HelicoidRobot():
 
         self.L0 = robot_params['L0']
         self.l0 = [[self.L0, self.L0, self.L0], [self.L0, self.L0, self.L0], [self.L0, self.L0, self.L0]]
-        self.l = [[0,0,0], [0,0,0], [0,0,0], [0,0,0]]
+        self.l = [[0,0,0], [0,0,0], [0,0,0]]
         self.s = self.L0
         self.r = robot_params['r']
         self.d = robot_params['d']
         pos = self.Arm.get_position()
-        self.th0 = copy.deepcopy([pos[:3], pos[3:6], pos[6:9]])
+        self.th0 = [[0,0,0], [0,0,0], [0,0,0]]
 
         print("-------------- INIT CONFIGURATION---------------------\n")
         print(f"[INIT] th0: {self.th0}\n")
@@ -102,15 +102,22 @@ class HelicoidRobot():
         pos = self.Arm.get_position()
         mj = self.Joint.get_position()[0]
         self.l = grab_helix_cable_lens(pos, self.l, self.l0, self.th0, self.r)  
-        l1 = self.l[0]
-        l2 = self.l[1]
-        l3 = self.l[2]
-        m1 = [l1[2], l2[2], l3[2]]
-        m2 = [l1[1], l2[1], l3[1]]
-        m3 = [l1[0], l2[0], l3[0]]
-        # print(f"m1: {m1}")
-        # print(f"m2: {m1}")
-        # print(f"m3: {m1}")
+        # print(f"in grab q here is l: {self.l}")
+        l1 = self.l[0]      # m1, m2, m3
+        l2 = self.l[1]      # m4, m5, m6
+        l3 = self.l[2]      # m7, m8, m9
+        # OG
+        # m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
+        # m2 = [l1[1], l2[1], l3[1]]  #
+        # m3 = [l1[0], l2[0], l3[0]]
+
+        # zach
+        m1 = [l1[2], l2[2], l3[2]]  # m3, m6, m9
+        m2 = [l1[1], l3[1], l2[1]]  # m2, m8, m5
+        m3 = [l2[0], l3[0], l1[0]]  # m4, m7, m1
+        print(f"m1: {m1}")  
+        print(f"m2: {m2}")
+        print(f"m3: {m3}")
         q = grab_helix_q(m1, m2, m3, mj, self.s, self.d)
         # q = grab_helix_q(l1, l2, l3, mj, self.s, d)
         return q
@@ -154,6 +161,7 @@ def main():
     os.system(shell_cmd)
     robot_params = load_robot_config()
     cntrl_params = load_controller_config()
+    print(f"control params: {cntrl_params}")
     Robot = HelicoidRobot(robot_params)
     # try:
     while True: 
@@ -182,6 +190,7 @@ def main():
             """
             Get current robot configuration
             """
+            print(f"[STATUS] current theta readings: {Robot.Arm.get_position()}")
             l = Robot.grab_cable_lens()
             l1 = l[0]
             l2 = l[1]
@@ -197,7 +206,7 @@ def main():
             Position control mode --- set "cable lengths"
             """
             print("-------------- POSITION MODE---------------------\n")
-
+            print(f"[POS] theta pre command: {Robot.Arm.get_position()}")
             print(f"[POS_MODE] pre command cable lengths: {Robot.grab_cable_lens()}")
             Robot.set_position()
             time.sleep(2)
@@ -211,6 +220,7 @@ def main():
             print(f"[POS_MODE] MOD 3 cable len: {[l1[0], l2[0], l3[0]]}")
             q = Robot.grab_q()
             print(f"[POS_MODE] Helix q: {q}")
+            print(f"[POS MODE] current theta readings: {Robot.Arm.get_position()}")
 
         elif key_input == chr(WKEY_ASCII_VALUE):
             """
@@ -238,6 +248,7 @@ def main():
             c_data = np.zeros((nmod,1))
             x_data = np.zeros((6,1))
             first_time = True
+            q_old = Robot.grab_q()
             t_old = time.time()
             t_0 = time.time()
             while 1:
@@ -283,7 +294,7 @@ def main():
                     x_data=np.append(x_data, np.append(x,dx).reshape(-1,1), axis = 1) 
                     err = q - qd
                     err_dot = dq
-                    # print(f"err: {err}\n")
+                    print(f"err: {err}\n")
                     tau, cont = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
                     print(f"[DEBUG] tau: {tau}\n")
                     c_data = np.append(c_data, cont, axis=1) 
@@ -292,12 +303,12 @@ def main():
                     input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
                     tau_data=np.append(tau_data, tau, axis=1) 
 
-                    # print(f"[DEBUG] mod cmds: {mod_cmds}\n")
+                    print(f"[DEBUG] mod cmds: {mod_cmds}\n")
 
-                    # print(f"[DEBUG] arm input: {arm_input}\n")
+                    print(f"[DEBUG] arm input: {arm_input}\n")
                     # arm_input = [2, 0, 0, 2, 0, 0, 2, 0, 0]
                     # mod_cmds = 
-                    # Robot.send_torque(arm_input, mod_cmds)
+                    Robot.send_torque(arm_input, mod_cmds)
                     
 
     # except:

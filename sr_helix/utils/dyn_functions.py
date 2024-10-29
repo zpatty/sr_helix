@@ -139,21 +139,25 @@ def grab_helix_cable_lens(pos, l, l0, th0, r):
     Arm = Mod class instance
     """
     # print("[DEBUG] in cable method")
+    # print(f"len of l: {len(l)}")
     pos = [pos[:3], pos[3:6], pos[6:9]]
     # print(f"[DEBUG] pos: {pos}")
     # print(f"[DEBUG] th0: {th0}")
     # print(f"[DEBUG] l0: {l0}")
-
+    r = 0.021/2
+    # print(f"r: {r}")
     for i in range(len(pos)):
-        # print(f"i: {i}")
+        # print(f"mod i: {i}")
         # grab cable lengths for each module
         dth = [0, 0, 0]
         for j in range(len(pos[0])):
             # into 3 motors
             th = pos[i][j]
             dth[j] = th - th0[i][j]
+            # print(f"dth: {dth[j]}")
         for k in range(len(l[i])):
             l[i][k] = l0[i][k] - (dth[k] * r)
+    # print(f"new l {l}")
     return l
 
 def grab_helix_q(l1, l2, l3, mj0, s, d):
@@ -169,7 +173,7 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     @q:  generalized coordinates [dx, dy, dL]
     """
     # need to flip direction for mod 1 and mod 3
-
+    Lm = 0.0001
     l1_1 = l1[0]
     l1_2 = l1[1]
     l1_3 = l1[2]

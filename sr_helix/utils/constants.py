@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import math
+import numpy as np
 # KEYBOARD INPUTS
 ESC_ASCII_VALUE             = 0x1b
 SPACE_ASCII_VALUE           = 0x20
@@ -33,9 +34,9 @@ med_plates = 0.036                      # in kg
 end_plate = 0.023                       # in kg
 # end_plate = 0
 # screws = 18* 0.5                        # in kg
-m = 6*segment_mass + 5 * med_plates + end_plate
+m = segment_mass + med_plates + end_plate
 Lm = 0.0                                # distance between center of spool and centroid of bottom plate
-L0 = 0.190                              # lengths when modules are not stressed (in m)
+L0 = 0.190                          # lengths when modules are not stressed (in m)
 
 # min and max are in mA because Dynamixel takes in mA inputs for current control
 max_torque = 250

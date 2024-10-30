@@ -29,9 +29,9 @@ MAX_DELTA = 650                         # in degrees
 DEG_PER_PULSE = 0.088                   # to convert degrees to motor steps
 
 err = math.inf                          # start with large error
-segment_mass = 0.00000000071                    # in kg
-med_plates = 0.000000000036                      # in kg
-end_plate = 0.00000000000023                       # in kg
+segment_mass = 0.0000000071                    # in kg
+med_plates = 0.0000000036                      # in kg
+end_plate = 0.00000000023                       # in kg
 # end_plate = 0
 # screws = 18* 0.5                        # in kg
 m = segment_mass + med_plates + end_plate

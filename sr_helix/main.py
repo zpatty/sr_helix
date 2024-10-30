@@ -314,15 +314,17 @@ def main():
                     err = q - qd
                     err_dot = dq
                     print(f"err: {err}\n")
-                    tau, cont, A = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
-                    A = A.reshape((10,10),order = 'F')    
+                    tau, A, C = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
+                    A = A.reshape((10,10),order = 'F')  
+
                     # tau = np.zeros((10,1))
+                    # tau[4:] = np.zeros((6,1))
                     # tau = np.linalg.inv(A) @ tau
-                    # tau[5] = 3
+                    # tau[1] = 6
                     force_tau = A.dot(tau)
                     print(f"forces tau: {force_tau}")
                     # print(f"tau size: {tau.size}")
-                    c_data = np.append(c_data, cont, axis=1) 
+                    print(f"C: {C}")
                     # tau= [m0, m3, m6, m9, m2, m8, m5, m4, m7, m1]
                     a_tau = np.array([tau[0], 
                                       tau[9], tau[4], tau[1],

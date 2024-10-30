@@ -145,7 +145,7 @@ def helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,d,r,param,helix_control
     helix_controller(np.squeeze(q), np.squeeze(dq), np.squeeze(qd),  np.squeeze(zero), np.squeeze(zero), d, m, \
                         r, kb, ks, bb, bs, bm, L0, np.squeeze(Kpvec), np.squeeze(KDvec), Kpx, KDx, np.squeeze(xd), np.squeeze(dxd), np.squeeze(dxr), conv_pcc, conv_motor, \
                         np.squeeze(tau), np.squeeze(tau_r), np.squeeze(x), np.squeeze(M), np.squeeze(C), np.squeeze(A), np.squeeze(cq))
-    return tau, cont, A
+    return tau, A, C
 
 def mat2np(fname, typ):
     """

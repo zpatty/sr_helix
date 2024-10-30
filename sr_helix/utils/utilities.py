@@ -27,6 +27,26 @@ def load_helix_controller():
     
     return helix_controller
 
+def grab_trajectories():
+    qd_name = os.path.join(file_dir, '../conf/qd.mat')
+    qd_name = os.path.abspath(os.path.realpath(qd_name))
+
+    dqd_name = os.path.join(file_dir, '../conf/dqd.mat')
+    dqd_name = os.path.abspath(os.path.realpath(dqd_name))
+
+    ddqd_name = os.path.join(file_dir, '../conf/ddqd.mat')
+    ddqd_name = os.path.abspath(os.path.realpath(ddqd_name))
+
+    tvec_name = os.path.join(file_dir, '../conf/tvec.mat')
+    tvec_name = os.path.abspath(os.path.realpath(tvec_name))
+
+    qd_mat = mat2np(qd_name, 'qd')
+    dqd_mat = mat2np(dqd_name, 'dqd')
+    ddqd_mat = mat2np(ddqd_name, 'ddqd')
+    tvec = mat2np(tvec_name, 'tvec')
+
+    return qd_mat, dqd_mat, ddqd_mat, tvec
+
 def load_robot_config():
     """
     Loads general robotic module/dynamixel config contents 

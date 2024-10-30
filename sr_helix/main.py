@@ -235,11 +235,12 @@ def main():
             print(f"[POS_MODE] Helix q: {q}")
             print(f"[POS MODE] current theta readings: {Robot.Arm.get_position()}")
 
-        elif key_input == chr(WKEY_ASCII_VALUE):
+        elif key_input == chr(WKEY_ASCII_VALUE) or (TKEY_ASCII_VALUE):
             """
             Set Arm to specific configuration
             """
             print(f"-------------- CONTROLLER MODE---------------------\n")
+            Robot.Arm.disable_torque()
             Robot.Arm.set_current_cntrl_mode()
             Robot.Arm.enable_torque()
             Robot.Joint.set_current_cntrl_mode()
@@ -265,6 +266,7 @@ def main():
             c_data = np.zeros((nmod,1))
             x_data = np.zeros((6,1))
             first_time = True
+            qd_mat, dqd_mat, ddqd_mat, tvec = grab_trajectories()
             q_old = Robot.grab_q()
             t_old = time.time()
             t_0 = time.time()
@@ -279,7 +281,10 @@ def main():
                     print(f"[OUTPUT] Our last recorded q: {q}\n")
                     err = q - qd
                     print(f"[OUTPUT] Our last recorded error: {err}\n")
-                    print(f"[OUTPUT] Our last recorded c: {cont}\n")
+                    print(f"[OUTPUT] dL1 error: {err[3]}\n")
+                    print(f"[OUTPUT] dL2 error: {err[6]}\n")
+                    print(f"[OUTPUT] dL3 error: {err[9]}\n")
+
                     print(f"max dt value: {np.max(dt_loop)}\n")
                     print(f"last time: {timestamps[-1]}\n")
                     config_params = json.dumps(cntrl_params, indent=14)
@@ -294,6 +299,16 @@ def main():
                     except:
                         q = q_old
                     print(f"[DEBUG] q: {q}")
+                    if key_input == chr(TKEY_ASCII_VALUE):
+                        n = np.argmax(tvec>time.time() - t_0) - 1
+                        # print(f"this takes: {time.time() - tt}\n")
+                        qd = np.array(qd_mat[:, n]).reshape(-1,1)
+                        dqd = np.array(dqd_mat[:, n]).reshape(-1,1)
+                        ddqd = np.array(ddqd_mat[:, n]).reshape(-1,1)
+                    else:
+                        dqd = zero
+                        ddqd = zero
+
                     if first_time:
                         first_time = False
                         dq = np.zeros((10,1))

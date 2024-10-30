@@ -41,7 +41,7 @@ L0 = 0.190                          # lengths when modules are not stressed (in 
 # min and max are in mA because Dynamixel takes in mA inputs for current control
 max_torque = 250
 # xm_max_torque = 1100
-xm_max_torque = 20
+xm_max_torque = 50
 
 min_torque = 5
 xm_min_torque = 2

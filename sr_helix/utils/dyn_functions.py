@@ -114,7 +114,7 @@ def torque_to_current(tau,l):
     # print(f"------------torque to current method -----------------\n")
     tau_clip = np.concatenate((np.zeros((1,1)), tau[1:]))
     # print(f"[DEBUG] tau clip: {tau_clip}")
-    tau_cables = np.maximum(tau_clip,-20 * np.ones((10,1)))
+    tau_cables = np.maximum(tau_clip,-xm_max_torque * np.ones((10,1)))
     # print(f"[DEBUG] tau cables: {tau_clip}")
     tau_cables[0,0] = tau[0,0]
     arm_input = grab_arm_current(tau_cables)
@@ -176,14 +176,21 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     l1_2 = l1[1]
     l1_3 = l1[2]
     phi1 = math.atan2(((math.sqrt(3)/3) * (l1_3 + l1_2 - 2 * l1_1)),(l1_2 - l1_3)) + np.pi
-    k1 = 2 * math.sqrt(l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3))/(d* (l1_1 + l1_2 + l1_3))
+    if l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3) < 0:
+        k1 = 0
+    else:
+        k1 = 2 * math.sqrt(l1_1**2 + l1_2**2 + l1_3**2 - (l1_1*l1_2) - (l1_2 * l1_3) - (l1_1*l1_3))/(d* (l1_1 + l1_2 + l1_3))
     
     l2_1 = l2[0]
     l2_2 = l2[2]
     l2_3 = l2[1]
     phi2 = math.atan2(((math.sqrt(3)/3) * (l2_3 + l2_2 - 2 * l2_1)),(l2_2 - l2_3))
-    k2 = 2 * math.sqrt(l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3))/(d* (l2_1 + l2_2 + l2_3))
-    
+    if l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3) < 0:
+        k2 = 0
+    else:
+        k2 = 2 * math.sqrt(l2_1**2 + l2_2**2 + l2_3**2 - (l2_1*l2_2) - (l2_2 * l2_3) - (l2_1*l2_3))/(d* (l2_1 + l2_2 + l2_3))
+
+
     l3_1 = l3[1]
     l3_2 = l3[2]
     l3_3 = l3[0]
@@ -193,8 +200,6 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     else:
         k3 = 2 * math.sqrt(l3_1**2 + l3_2**2 + l3_3**2 - (l3_1*l3_2) - (l3_2 * l3_3) - (l3_1*l3_3))/(d* (l3_1 + l3_2 + l3_3))
         
-
-
     s_curr1 = (l1_1 + l1_2 + l1_3)/3
     s_curr2 = (l2_1 + l2_2 + l2_3)/3
     s_curr3 = (l3_1 + l3_2 + l3_3)/3
@@ -210,13 +215,11 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     dL3 = s_curr3 - s 
     dx3 = k3 * s_curr3 * d * cos(phi3)
     dy3 = k3 * s_curr3 * d * sin(phi3)
+    print(f"k1: {k1}")
+    print(f"k2: {k2}")
+    print(f"k3: {k3}")
 
     dxs = [dx1, dy1, dx2, dy2, dx3, dy3]
-    # for i in range(len(dxs)):
-    #     if dxs[i] < 10e-3:
-    #         dxs[i] = 0
-    # print(f"k1, k2, k3: {[k1, k2, k3]}")
-    # q = np.array([mj0, dx1, dy1, dL1, dx2, dy2, dL2, dx3, dy3, dL3]).reshape(-1,1)
     q = np.array([mj0, dxs[0], dxs[1], dL1, dxs[2], dxs[3], dL2, dxs[4], dxs[5], dL3]).reshape(-1,1)
 
     return q

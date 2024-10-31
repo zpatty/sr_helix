@@ -77,7 +77,6 @@ vpa(subs(Jr, [d; L0; q; dc], [0.01; 0.1; 0.000000000001*ones(10,1); 0.001]))
 % 
 % limit(limit(J,dx,0),dy,0)
 % limit(limit(dJ,dx,0),dy,0)
-g = {g{1}, g{2}};
 
 %%
 ginvf = @(g) [g(1:3,1:3).' -g(1:3,1:3).'*g(1:3,4); zeros(1,3) 1];
@@ -160,9 +159,9 @@ matlabFunction(C,"File","C_calc")
 % C = simplify(subs(C,sqrt(dx^2+dy^2),delta));
 % M = subs(M,sqrt(dx^2+dy^2),delta);
 %%
-h = [g{1}(3,4); g{2}(3,4)];
+h = [g{1}(3,4); g{2}(3,4); g{3}(3,4); g{4}(3,4)];
 syms gr
-Vg = m'*gr*h;
+Vg = [m1; m2; m2; m2]'*gr*h;
 Fg = jacobian(Vg,q).';
 %%
 mv = 0.03;

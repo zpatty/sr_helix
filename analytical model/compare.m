@@ -70,7 +70,7 @@ for j = 1:3
 end
 
 wve = linspace(2,20);
-wve = [4, 8, 12];
+% wve = [4, 8, 12];
 for j = 1:length(wve)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
@@ -143,15 +143,14 @@ for j = 1:length(wve)
     % A = pi*(rm)^2;
     % A = pi*(r^2 - ri^2);
     If = pi/4 * (rm^4);
-    % If = pi*rm^3*w;
     A = pi*(rm)^2;
     kbw(j) = 1/(y/r) /Nh*Nh/pi;
-    kbw(j) = kw(j)*If/H;
+    kbw(j) = kw(j)*If/A*rm/H*3*3;
 end
 
 tv = linspace(1,8);
 % tv = [2,4,6];
-for j = 1:length(tv)
+for j = 1:length(wve)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
     w = 8/1000;
@@ -306,19 +305,17 @@ for j = 1:length(Dv)
     
     kbD(j) = 1/(y/r) /Nh*Nh/pi;
     % kbD(j) = 2/pi*kD(j)*Dm^2*4;
-    A = pi*(r^2 - ri^2);
-    If = pi/4 * (r^4 - ri^4);
+    % A = pi*(r^2 - ri^2);
     If = pi/4 * (rm^4);
-    % If = pi*rm^3*w;
-    % A = pi*(rm)^2;
+    A = pi*(rm)^2;
     y = 1/12 * (Lo) .^3 ./ I / E * cosd(alpha)^2;  %needs * 4/3, 2 from other side
     kbD(j) = kD(j)*If/A*r/ri/2;
-    kbD(j) = kD(j)*If/H*91;
+    kbD(j) = kD(j)*If/A*rm/H*3*3;
 end
 
 Hv = linspace(0.05,0.2);
-% Hv = [0.12, 0.145, 0.17];
-for j = 1:length(Hv)
+Hv = [0.12, 0.145, 0.17];
+for j = 1:length(wve)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
     w = 8/1000;
@@ -592,4 +589,3 @@ fig = gcf;
 if savef == 1
     print(fig, "H", '-dpdf')
 end
-

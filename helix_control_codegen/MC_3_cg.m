@@ -15,8 +15,8 @@ function [M, C] = MC_3_cg(q,qd,m,r,L0,d)
 % L0 = Length of a module;
 % d = distance to cable;
 % N = number of links (number of modules plus number of motors)
-N=4;
-a_grav = [0;0;9.81/2;0;0;0];
+N=2;
+a_grav = [0;0;0;0;0;0];
 % for i=1:N-1
 %     q(i*3+1) = -q(i*3+1);
 %     qd(i*3+1) = -qd(i*3+1);
@@ -74,11 +74,11 @@ X_out = X;
 for i = N:-1:1
     if i == 1
         qi = 1;
-        C(qi,1) = 2 * Smotz' * f(:,i);
+        C(qi,1) = Smotz' * f(:,i);
         J(:, qi) = X * Smotz;
     else
         qi = (i-2)*3 + 2:(i-2)*3 + 4;
-        C(qi,1) = 2 * Smod(:,:,i-1)' * f(:,i);
+        C(qi,1) = Smod(:,:,i-1)' * f(:,i);
         f(:,i-1) = f(:,i-1) + Xup(:,:,i)'*f(:,i);
         J(:, qi) = X * Smod(:,:,i-1);
         X = X *  XJ(:,:,i) * Xtree;

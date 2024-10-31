@@ -215,9 +215,9 @@ def grab_helix_q(l1, l2, l3, mj0, s, d):
     dL3 = s_curr3 - s 
     dx3 = k3 * s_curr3 * d * cos(phi3)
     dy3 = k3 * s_curr3 * d * sin(phi3)
-    print(f"k1: {k1}")
-    print(f"k2: {k2}")
-    print(f"k3: {k3}")
+    # print(f"k1: {k1}")
+    # print(f"k2: {k2}")
+    # print(f"k3: {k3}")
 
     dxs = [dx1, dy1, dx2, dy2, dx3, dy3]
     q = np.array([mj0, dxs[0], dxs[1], dL1, dxs[2], dxs[3], dL2, dxs[4], dxs[5], dL3]).reshape(-1,1)

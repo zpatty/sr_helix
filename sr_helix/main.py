@@ -248,7 +248,7 @@ def main():
             helix_controller = load_helix_controller()
             qd_str = parse_setpoint()
             qd = grab_helix_qd(qd_str, Robot.d)
-            print(f"[DEBUG] qd: {qd}\n")
+            # print(f"[DEBUG] qd: {qd}\n")
             xd = np.array([qd_str['xd'], qd_str['yd'], qd_str['zd']]).reshape(-1,1)
             zero = np.zeros((10,1))
             dqd = zero
@@ -258,7 +258,7 @@ def main():
             nq = 10
             nmod = 4
             q_data = np.zeros((nq*2, 1))
-            print(f"Q DATA SIZE: {q_data.shape}")
+            # print(f"Q DATA SIZE: {q_data.shape}")
             tau_data = np.zeros((nq,1))
             input_data = np.zeros((nq,1))
             dt_loop = np.zeros((1,1))       # hold dt data 
@@ -298,7 +298,7 @@ def main():
                         q = Robot.grab_q()
                     except:
                         q = q_old
-                    print(f"[DEBUG] q: {q}")
+                    # print(f"[DEBUG] q: {q}")
                     if key_input == chr(TKEY_ASCII_VALUE):
                         n = np.argmax(tvec>time.time() - t_0) - 1
                         # print(f"this takes: {time.time() - tt}\n")
@@ -328,7 +328,7 @@ def main():
                     x_data=np.append(x_data, np.append(x,dx).reshape(-1,1), axis = 1) 
                     err = q - qd
                     err_dot = dq
-                    print(f"err: {err}\n")
+                    # print(f"err: {err}\n")
                     tau, A, C = helix_controller_wrapper(q,dq,qd,dqd,ddqd,xd,dxd,dxr,Robot.d,Robot.r,cntrl_params,helix_controller, Lm=Lm)                
                     A = A.reshape((10,10),order = 'F')  
 
@@ -337,23 +337,23 @@ def main():
                     # tau = np.linalg.inv(A) @ tau
                     # tau[1] = 6
                     force_tau = A.dot(tau)
-                    print(f"forces tau: {force_tau}")
+                    # print(f"forces tau: {force_tau}")
                     # print(f"tau size: {tau.size}")
-                    print(f"C: {C}")
+                    # print(f"C: {C}")
                     # tau= [m0, m3, m6, m9, m2, m8, m5, m4, m7, m1]
                     a_tau = np.array([tau[0], 
                                       tau[9], tau[4], tau[1],
                                       tau[7], tau[6], tau[2],
                                       tau[8], tau[5], tau[3]])
-                    print(f"[DEBUG] tau: {tau}\n")
-                    print(f"realigned motors: {a_tau}")
+                    # print(f"[DEBUG] tau: {tau}\n")
+                    # print(f"realigned motors: {a_tau}")
                     arm_input, mod_cmds = torque_to_current(a_tau,Robot.l)
                     input_data=np.append(input_data, np.array(arm_input).reshape(-1,1), axis=1) 
                     tau_data=np.append(tau_data, tau, axis=1) 
 
-                    print(f"[DEBUG] mod cmds: {mod_cmds}\n")
-                    print(f"[DEBUG] arm input: {arm_input}\n")
-                    print(f"[DEBUG] joint input: {arm_input[0]}\n")
+                    # print(f"[DEBUG] mod cmds: {mod_cmds}\n")
+                    # print(f"[DEBUG] arm input: {arm_input}\n")
+                    # print(f"[DEBUG] joint input: {arm_input[0]}\n")
 
                     # mod_cmds = arm_input
                     Robot.send_torque(arm_input, mod_cmds)

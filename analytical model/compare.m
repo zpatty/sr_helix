@@ -315,7 +315,7 @@ end
 
 Hv = linspace(0.05,0.2);
 Hv = [0.12, 0.145, 0.17];
-for j = 1:length(wve)
+for j = 1:length(Hv)
     ShA = 45;
     E = 0.0981 * (56 + 7.62336 * ShA)/(0.137505 * (254 - 2.54 * ShA))*1e6;
     w = 8/1000;

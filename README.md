@@ -1,6 +1,6 @@
 # Soft-Rigid Hybrid Trimmed Helicoid Robots
 
-This repository contains code, data, and design files for the paper TITLE.
+This repository contains code, data, and design files for the paper "Design of Trimmed Helicoid Soft-Rigid Hybrid Robots".
 
 ## Robot Code
 We provide a software library to control a 10 DOF robot with a rigid vertical axis rotation at the base and three 3-DOF soft segments (currently modeled with the piecewise constant curvature model). 
